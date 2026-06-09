@@ -1,0 +1,36 @@
+services:
+
+  postgres:
+
+    image: postgres:16-alpine
+
+    container_name: gestor-postgres
+
+    restart: unless-stopped
+
+    ports:
+
+      - "5432:5432"
+
+    env_file:
+
+      - apps/api/.env
+
+    environment:
+
+      POSTGRES_USER: ${DB_USERNAME}
+
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+      POSTGRES_DB: ${DB_DATABASE}
+
+    volumes:
+
+      - postgres_data:/var/lib/postgresql/data
+
+
+
+volumes:
+
+  postgres_data:
+
