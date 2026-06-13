@@ -30,7 +30,6 @@ import {
   TripSwitcher,
   TripSwitcherFooter,
 } from "@/app/(app)/trips/[tripId]/_components/trip-switcher"
-import { Button } from "@/components/ui/button"
 
 export function AppSidebar() {
   const pathname = usePathname()
@@ -100,24 +99,15 @@ export function AppSidebar() {
                 <DropdownMenuItem
                   variant="destructive"
                   className="cursor-pointer gap-2"
-                  render={
-                    <Button
-                      type="submit"
-                      form="sidebar-logout-form"
-                      variant="ghost"
-                      className="w-full justify-start"
-                    >
-                      <LogOut />
-                      Sair
-                    </Button>
-                  }
-                ></DropdownMenuItem>
+                  onClick={() => logoutAction()}
+                >
+                  <LogOut />
+                  Sair
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
-
-        <form id="sidebar-logout-form" action={logoutAction} hidden />
       </SidebarFooter>
 
       <SidebarRail />
