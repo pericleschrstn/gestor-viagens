@@ -66,6 +66,33 @@ export type Expense = {
   splits?: ExpenseSplit[]
 }
 
+export type PaginatedResult<T> = {
+  data: T[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    pageCount: number
+  }
+}
+
+export type ExpenseSortOrder =
+  | "newest"
+  | "oldest"
+  | "amount_desc"
+  | "amount_asc"
+
+export type ListExpensesQuery = {
+  page?: number
+  limit?: number
+  search?: string
+  category?: ExpenseCategory
+  memberId?: string
+  startDate?: string
+  endDate?: string
+  sort?: ExpenseSortOrder
+}
+
 export type CategorySummary = {
   category: ExpenseCategory
   spent: number

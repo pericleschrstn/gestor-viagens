@@ -4,7 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  PaginatedResult,
+  paginate,
+} from '../common/interfaces/paginated-result.interface';
 import { parseDecimal } from '../common/utils/currency.util';
 import { MembersService } from '../members/members.service';
 import { TripsService } from '../trips/trips.service';
@@ -32,16 +36,39 @@ export class ExpensesService {
     tripId: string,
     ownerId: string,
     query: ListExpensesQueryDto,
-  ): Promise<Expense[]> {
+  ): Promise<PaginatedResult<Expense>> {
     await this.tripsService.findOneForOwner(tripId, ownerId);
 
-    const qb = this.expenseRepository
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+
+    const countQb = this.expenseRepository
+      .createQueryBuilder('expense')
+      .leftJoin('expense.splits', 'splits')
+      .where('expense.tripId = :tripId', { tripId });
+    this.applyExpenseFilters(countQb, query);
+    const total = await countQb.distinct(true).getCount();
+
+    const dataQb = this.expenseRepository
       .createQueryBuilder('expense')
       .leftJoinAndSelect('expense.payer', 'payer')
       .leftJoinAndSelect('expense.splits', 'splits')
       .leftJoinAndSelect('splits.member', 'member')
       .where('expense.tripId = :tripId', { tripId });
+    this.applyExpenseFilters(dataQb, query);
+    this.applyExpenseSort(dataQb, query);
+    const data = await dataQb
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany();
 
+    return paginate(data, total, page, limit);
+  }
+
+  private applyExpenseFilters(
+    qb: SelectQueryBuilder<Expense>,
+    query: ListExpensesQueryDto,
+  ): void {
     if (query.search) {
       qb.andWhere('expense.description ILIKE :search', {
         search: `%${query.search}%`,
@@ -66,7 +93,12 @@ export class ExpensesService {
     if (query.endDate) {
       qb.andWhere('expense.date <= :endDate', { endDate: query.endDate });
     }
+  }
 
+  private applyExpenseSort(
+    qb: SelectQueryBuilder<Expense>,
+    query: ListExpensesQueryDto,
+  ): void {
     switch (query.sort ?? ExpenseSortOrder.NEWEST) {
       case ExpenseSortOrder.OLDEST:
         qb.orderBy('expense.date', 'ASC').addOrderBy('expense.createdAt', 'ASC');
@@ -81,8 +113,6 @@ export class ExpensesService {
         qb.orderBy('expense.date', 'DESC').addOrderBy('expense.createdAt', 'DESC');
         break;
     }
-
-    return qb.getMany();
   }
 
   async findOneForOwner(expenseId: string, ownerId: string): Promise<Expense> {

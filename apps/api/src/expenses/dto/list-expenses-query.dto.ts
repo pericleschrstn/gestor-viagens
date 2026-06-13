@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 import { ExpenseCategory } from '../../common/enums/expense-category.enum';
 
 export enum ExpenseSortOrder {
@@ -9,7 +10,7 @@ export enum ExpenseSortOrder {
   AMOUNT_ASC = 'amount_asc',
 }
 
-export class ListExpensesQueryDto {
+export class ListExpensesQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

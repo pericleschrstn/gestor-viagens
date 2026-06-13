@@ -58,6 +58,18 @@ async function main() {
     },
   });
 
+  const expenses = await request(`/trips/${trip.id}/expenses?page=1&limit=10`, {
+    token: auth.accessToken,
+  });
+
+  if (!Array.isArray(expenses.data) || expenses.data.length !== 1) {
+    throw new Error(`Expected 1 expense in paginated data, got ${expenses.data?.length}`);
+  }
+
+  if (expenses.meta?.total !== 1 || expenses.meta?.page !== 1 || expenses.meta?.limit !== 10) {
+    throw new Error(`Unexpected pagination meta: ${JSON.stringify(expenses.meta)}`);
+  }
+
   const summary = await request(`/trips/${trip.id}/summary`, {
     token: auth.accessToken,
   });
