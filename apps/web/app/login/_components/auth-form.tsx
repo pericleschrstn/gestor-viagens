@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label"
 import {
   loginAction,
   registerAction,
-} from "@/lib/api/actions/auth"
+} from "@/features/auth/actions/auth.actions"
 
 export function AuthForm() {
   const router = useRouter()
@@ -39,8 +39,8 @@ export function AuthForm() {
           ? await loginAction({ email, password })
           : await registerAction({ name, email, password })
 
-      if (!result.success) {
-        setError(result.error)
+      if (!result.ok) {
+        setError(result.error.message)
         return
       }
 
