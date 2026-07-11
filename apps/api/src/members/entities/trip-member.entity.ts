@@ -6,6 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { TripMemberRole } from '../../common/enums/trip-member-role.enum';
 import { Expense } from '../../expenses/entities/expense.entity';
 import { ExpenseSplit } from '../../expenses/entities/expense-split.entity';
 import { Settlement } from '../../settlements/entities/settlement.entity';
@@ -28,6 +29,13 @@ export class TripMember {
 
   @Column({ type: 'uuid', name: 'user_id', nullable: true })
   userId!: string | null;
+
+  @Column({
+    type: 'enum',
+    enum: TripMemberRole,
+    nullable: true,
+  })
+  role!: TripMemberRole | null;
 
   @ManyToOne(() => Trip, (trip) => trip.members, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'trip_id' })
