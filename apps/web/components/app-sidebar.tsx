@@ -22,7 +22,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { logoutAction } from "@/lib/api/actions/auth"
+import { logoutAction } from "@/features/auth/actions/auth.actions"
 import { getTripIdFromPathname } from "@/lib/trip-routes"
 
 import { TripNav } from "@/app/(app)/trips/[tripId]/_components/trip-nav"

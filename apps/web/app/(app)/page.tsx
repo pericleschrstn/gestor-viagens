@@ -1,20 +1,20 @@
 import { redirect } from "next/navigation"
 
-import { getSession } from "@/lib/api/auth"
-import { isUnauthorized } from "@/lib/api/errors"
-import { listTrips } from "@/lib/api/trips"
+import { authService } from "@/features/auth/application/auth.service"
+import { isUnauthorized } from "@/features/shared/domain/errors"
+import { tripsService } from "@/features/trips/application/trips.service"
 
 import { HomeEmptyState } from "./home-empty-state"
 
 export default async function HomePage() {
-  const user = await getSession()
+  const user = await authService.getSession()
   if (!user) {
     redirect("/login")
   }
 
   let trips
   try {
-    trips = await listTrips()
+    trips = await tripsService.listTrips()
   } catch (error) {
     if (isUnauthorized(error)) {
       redirect("/login")

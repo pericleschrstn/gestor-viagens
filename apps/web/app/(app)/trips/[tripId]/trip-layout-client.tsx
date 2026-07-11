@@ -3,12 +3,9 @@
 import type { ReactNode } from "react"
 
 import { TripSidebarBridge } from "@/components/app-shell"
-import type {
-  PublicUser,
-  Trip,
-  TripMember,
-  TripSummary,
-} from "@/lib/api/types"
+import type { AuthUser } from "@/features/auth/domain/models"
+import type { TripCapabilities } from "@/features/shared/domain/capabilities"
+import type { Trip, TripMember, TripSummary } from "@/features/trips/domain/models"
 
 import { ExpenseFormDialog } from "./_components/expense-form-dialog"
 import { TripApp } from "./_components/trip-app"
@@ -19,7 +16,8 @@ type TripLayoutClientProps = {
   trips: Trip[]
   summary: TripSummary
   members: TripMember[]
-  user: PublicUser
+  user: AuthUser
+  capabilities: TripCapabilities
   children: ReactNode
 }
 
@@ -29,6 +27,7 @@ export function TripLayoutClient({
   summary,
   members,
   user,
+  capabilities,
   children,
 }: TripLayoutClientProps) {
   return (
@@ -38,11 +37,12 @@ export function TripLayoutClient({
       summary={summary}
       members={members}
       user={user}
+      capabilities={capabilities}
     >
       <TripSidebarBridge tripId={trip.id} summary={summary} />
       <TripAppBar />
       <TripApp.Content>{children}</TripApp.Content>
-      <ExpenseFormDialog />
+      {capabilities.canWrite ? <ExpenseFormDialog /> : null}
     </TripApp.Provider>
   )
 }

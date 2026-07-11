@@ -1,10 +1,9 @@
 import { notFound, redirect } from "next/navigation"
 
-import { getSession } from "@/lib/api/auth"
-import { getTripSummary } from "@/lib/api/budgets"
-import { isNotFound, isUnauthorized } from "@/lib/api/errors"
-import { listMembers } from "@/lib/api/members"
-import { getTrip, listTrips } from "@/lib/api/trips"
+import { authService } from "@/features/auth/application/auth.service"
+import { expensesService } from "@/features/expenses/application/expenses.service"
+import { isNotFound, isUnauthorized } from "@/features/shared/domain/errors"
+import { tripsService } from "@/features/trips/application/trips.service"
 
 import { TripLayoutClient } from "./trip-layout-client"
 
@@ -13,33 +12,29 @@ type TripLayoutProps = {
   params: Promise<{ tripId: string }>
 }
 
+async function loadTripLayout(tripId: string) {
+  const [trips, trip, summary, members, user, capabilities] = await Promise.all([
+    tripsService.listTrips(),
+    tripsService.getTrip(tripId),
+    tripsService.getSummary(tripId),
+    tripsService.listMembers(tripId),
+    authService.getSession(),
+    expensesService.getTripAccess(tripId),
+  ])
+
+  if (!user) {
+    redirect("/login")
+  }
+
+  return { trips, trip, summary, members, user, capabilities }
+}
+
 export default async function TripLayout({ children, params }: TripLayoutProps) {
   const { tripId } = await params
 
+  let data: Awaited<ReturnType<typeof loadTripLayout>>
   try {
-    const [trips, trip, summary, members, user] = await Promise.all([
-      listTrips(),
-      getTrip(tripId),
-      getTripSummary(tripId),
-      listMembers(tripId),
-      getSession(),
-    ])
-
-    if (!user) {
-      redirect("/login")
-    }
-
-    return (
-      <TripLayoutClient
-        trip={trip}
-        trips={trips}
-        summary={summary}
-        members={members}
-        user={user}
-      >
-        {children}
-      </TripLayoutClient>
-    )
+    data = await loadTripLayout(tripId)
   } catch (error) {
     if (isUnauthorized(error)) {
       redirect("/login")
@@ -49,4 +44,17 @@ export default async function TripLayout({ children, params }: TripLayoutProps) 
     }
     throw error
   }
+
+  return (
+    <TripLayoutClient
+      trip={data.trip}
+      trips={data.trips}
+      summary={data.summary}
+      members={data.members}
+      user={data.user}
+      capabilities={data.capabilities}
+    >
+      {children}
+    </TripLayoutClient>
+  )
 }

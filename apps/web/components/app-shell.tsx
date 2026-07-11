@@ -15,7 +15,8 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import type { PublicUser, Trip, TripSummary } from "@/lib/api/types"
+import type { AuthUser } from "@/features/auth/domain/models"
+import type { Trip, TripSummary } from "@/features/trips/domain/models"
 
 import { AppSidebar } from "./app-sidebar"
 
@@ -25,7 +26,7 @@ type TripSidebarState = {
 } | null
 
 type AppShellContextValue = {
-  user: PublicUser
+  user: AuthUser
   trips: Trip[]
   tripSidebar: TripSidebarState
   setTripSidebar: Dispatch<SetStateAction<TripSidebarState>>
@@ -46,7 +47,7 @@ export function useOptionalAppShell() {
 }
 
 type AppShellProps = {
-  user: PublicUser
+  user: AuthUser
   trips: Trip[]
   children: ReactNode
 }

@@ -1,23 +1,24 @@
 import { redirect } from "next/navigation"
 
 import { AppShell } from "@/components/app-shell"
-import { getSession } from "@/lib/api/auth"
-import { isUnauthorized } from "@/lib/api/errors"
-import { listTrips } from "@/lib/api/trips"
+import { QueryProvider } from "@/components/query-provider"
+import { authService } from "@/features/auth/application/auth.service"
+import { isUnauthorized } from "@/features/shared/domain/errors"
+import { tripsService } from "@/features/trips/application/trips.service"
 
 export default async function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const user = await getSession()
+  const user = await authService.getSession()
   if (!user) {
     redirect("/login")
   }
 
   let trips
   try {
-    trips = await listTrips()
+    trips = await tripsService.listTrips()
   } catch (error) {
     if (isUnauthorized(error)) {
       redirect("/login")
@@ -26,8 +27,10 @@ export default async function AppLayout({
   }
 
   return (
-    <AppShell user={user} trips={trips}>
-      {children}
-    </AppShell>
+    <QueryProvider>
+      <AppShell user={user} trips={trips}>
+        {children}
+      </AppShell>
+    </QueryProvider>
   )
 }

@@ -21,11 +21,12 @@ export function CategoryDonut() {
   const categoriesWithSpent = summary.byCategory.filter((item) => item.spent > 0)
   const total = categoriesWithSpent.reduce((sum, item) => sum + item.spent, 0)
 
-  let cumulative = 0
-  const segments = categoriesWithSpent.map((item) => {
-    const start = (cumulative / Math.max(total, 1)) * 100
-    cumulative += item.spent
-    const end = (cumulative / Math.max(total, 1)) * 100
+  const segments = categoriesWithSpent.map((item, index) => {
+    const spentBefore = categoriesWithSpent
+      .slice(0, index)
+      .reduce((sum, prev) => sum + prev.spent, 0)
+    const start = (spentBefore / Math.max(total, 1)) * 100
+    const end = ((spentBefore + item.spent) / Math.max(total, 1)) * 100
     return {
       ...item,
       start,

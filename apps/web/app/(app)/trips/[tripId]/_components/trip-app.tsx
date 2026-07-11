@@ -1,14 +1,13 @@
 "use client"
 
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 
-import type {
-  PublicUser,
-  Trip,
-  TripMember,
-  TripSummary,
-} from "@/lib/api/types"
+import type { AuthUser } from "@/features/auth/domain/models"
+import type { TripCapabilities } from "@/features/shared/domain/capabilities"
+import { expenseKeys } from "@/features/expenses/ui/query-keys"
+import type { Trip, TripMember, TripSummary } from "@/features/trips/domain/models"
 import { categoryLabel, formatMoney, formatTripDates } from "@/lib/format"
 
 type TripAppState = {
@@ -16,7 +15,8 @@ type TripAppState = {
   trips: Trip[]
   summary: TripSummary
   members: TripMember[]
-  user: PublicUser
+  user: AuthUser
+  capabilities: TripCapabilities
   expenseDialogOpen: boolean
 }
 
@@ -24,6 +24,7 @@ type TripAppActions = {
   openExpenseDialog: () => void
   closeExpenseDialog: () => void
   refresh: () => void
+  invalidateExpenses: () => void
 }
 
 type TripAppMeta = {
@@ -53,7 +54,8 @@ type TripAppProviderProps = {
   trips: Trip[]
   summary: TripSummary
   members: TripMember[]
-  user: PublicUser
+  user: AuthUser
+  capabilities: TripCapabilities
   children: ReactNode
 }
 
@@ -63,9 +65,11 @@ function TripAppProvider({
   summary,
   members,
   user,
+  capabilities,
   children,
 }: TripAppProviderProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false)
 
   const value = useMemo<TripAppContextValue>(
@@ -76,12 +80,15 @@ function TripAppProvider({
         summary,
         members,
         user,
+        capabilities,
         expenseDialogOpen,
       },
       actions: {
         openExpenseDialog: () => setExpenseDialogOpen(true),
         closeExpenseDialog: () => setExpenseDialogOpen(false),
         refresh: () => router.refresh(),
+        invalidateExpenses: () =>
+          void queryClient.invalidateQueries({ queryKey: expenseKeys.all }),
       },
       meta: {
         formatMoney: (value: number) => formatMoney(value, summary.currency),
@@ -89,7 +96,17 @@ function TripAppProvider({
         categoryLabel,
       },
     }),
-    [trip, trips, summary, members, user, expenseDialogOpen, router],
+    [
+      trip,
+      trips,
+      summary,
+      members,
+      user,
+      capabilities,
+      expenseDialogOpen,
+      router,
+      queryClient,
+    ],
   )
 
   return <TripAppContext value={value}>{children}</TripAppContext>

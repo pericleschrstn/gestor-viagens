@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import { formatTripDates, tripStatusLabel } from "@/lib/format"
-import type { Trip } from "@/lib/api/types"
+import type { Trip } from "@/features/trips/domain/models"
 import { tripHref } from "@/lib/trip-routes"
 
 type TripSwitcherProps = {

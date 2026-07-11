@@ -16,6 +16,7 @@ export function TripAppBar() {
   const pathname = usePathname()
   const activeView = getTripViewFromPathname(pathname) ?? "dashboard"
   const {
+    state: { capabilities },
     actions: { openExpenseDialog },
   } = useTripApp()
 
@@ -32,7 +33,7 @@ export function TripAppBar() {
         </span>
       </nav>
 
-      {activeView === "dashboard" ? (
+      {capabilities.canWrite ? (
         <Button onClick={openExpenseDialog}>
           <Plus data-icon="inline-start" />
           Adicionar gasto

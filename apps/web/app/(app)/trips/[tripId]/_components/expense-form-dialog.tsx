@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useTransition } from "react"
+import { useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Upload } from "lucide-react"
 
@@ -26,8 +26,8 @@ import {
 import { cn } from "@/lib/utils"
 import { ALL_CATEGORIES, CATEGORY_CONFIG } from "@/lib/categories"
 import { categoryLabel } from "@/lib/format"
-import { createExpenseAction } from "@/lib/api/actions/expenses"
-import type { Currency, ExpenseCategory } from "@/lib/api/types"
+import { createExpenseAction } from "@/features/expenses/actions/expense.actions"
+import type { Currency, ExpenseCategory } from "@/features/expenses/domain/schemas"
 
 import { useTripApp } from "./trip-app"
 
@@ -58,8 +58,8 @@ function buildEqualSplits(amount: string, memberIds: string[]) {
 
 export function ExpenseFormDialog() {
   const {
-    state: { trip, members, expenseDialogOpen },
-    actions: { closeExpenseDialog, refresh },
+    state: { trip, members, expenseDialogOpen, capabilities },
+    actions: { closeExpenseDialog, refresh, invalidateExpenses },
   } = useTripApp()
 
   const [description, setDescription] = useState("")
@@ -74,7 +74,11 @@ export function ExpenseFormDialog() {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  useEffect(() => {
+  // Reinicia o formulário ao abrir o diálogo (padrão "ajustar estado quando uma
+  // prop muda", sem efeito): https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  const [wasOpen, setWasOpen] = useState(false)
+  if (expenseDialogOpen !== wasOpen) {
+    setWasOpen(expenseDialogOpen)
     if (expenseDialogOpen) {
       setDescription("")
       setAmount("")
@@ -85,7 +89,7 @@ export function ExpenseFormDialog() {
       setSelectedMemberIds(members.map((member) => member.id))
       setError(null)
     }
-  }, [expenseDialogOpen, trip.baseCurrency, members])
+  }
 
   function toggleMember(memberId: string) {
     setSelectedMemberIds((current) =>
@@ -118,15 +122,16 @@ export function ExpenseFormDialog() {
         category,
         payerId,
         splits: buildEqualSplits(amount, selectedMemberIds),
-      })
+      }, capabilities)
 
-      if (!result.success) {
-        setError(result.error)
+      if (!result.ok) {
+        setError(result.error.message)
         return
       }
 
       toast.success("Gasto adicionado")
       closeExpenseDialog()
+      invalidateExpenses()
       refresh()
     })
   }
