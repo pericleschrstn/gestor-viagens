@@ -8,7 +8,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
-import type { ExpenseCategory } from "@/lib/api/types"
+import type { ExpenseCategory } from "@/features/expenses/domain/schemas"
 
 export const CATEGORY_CONFIG: Record<
   ExpenseCategory,

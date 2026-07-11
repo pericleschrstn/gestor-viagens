@@ -1,4 +1,4 @@
-import type { Currency, ExpenseCategory } from "@/lib/api/types"
+import type { Currency, ExpenseCategory } from "@/features/expenses/domain/schemas"
 
 export function formatMoney(value: number, currency: Currency): string {
   return new Intl.NumberFormat("pt-BR", {
