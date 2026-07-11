@@ -1,5 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { Transform } from 'class-transformer';
+import {
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 import { ExpenseCategory } from '../../common/enums/expense-category.enum';
 
@@ -16,15 +24,23 @@ export class ListExpensesQueryDto extends PaginationQueryDto {
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ enum: ExpenseCategory })
+  @ApiPropertyOptional({ enum: ExpenseCategory, isArray: true })
   @IsOptional()
-  @IsEnum(ExpenseCategory)
-  category?: ExpenseCategory;
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value : value ? [value] : undefined,
+  )
+  @IsArray()
+  @IsEnum(ExpenseCategory, { each: true })
+  categories?: ExpenseCategory[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ isArray: true })
   @IsOptional()
-  @IsUUID()
-  memberId?: string;
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value : value ? [value] : undefined,
+  )
+  @IsArray()
+  @IsUUID('4', { each: true })
+  memberIds?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()

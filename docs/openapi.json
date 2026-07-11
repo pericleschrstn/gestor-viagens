@@ -1,0 +1,1231 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/trips": {
+      "get": {
+        "operationId": "TripsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "trips"
+        ]
+      },
+      "post": {
+        "operationId": "TripsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTripDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "trips"
+        ]
+      }
+    },
+    "/trips/{id}/access": {
+      "get": {
+        "operationId": "TripsController_getAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripAccessDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "trips"
+        ]
+      }
+    },
+    "/trips/{id}": {
+      "get": {
+        "operationId": "TripsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "trips"
+        ]
+      },
+      "patch": {
+        "operationId": "TripsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTripDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "trips"
+        ]
+      },
+      "delete": {
+        "operationId": "TripsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "trips"
+        ]
+      }
+    },
+    "/trips/{id}/members": {
+      "get": {
+        "operationId": "MembersController_findAll",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "members"
+        ]
+      },
+      "post": {
+        "operationId": "MembersController_create",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "members"
+        ]
+      }
+    },
+    "/members/{id}": {
+      "patch": {
+        "operationId": "MembersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "members"
+        ]
+      },
+      "delete": {
+        "operationId": "MembersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "members"
+        ]
+      }
+    },
+    "/trips/{id}/expenses": {
+      "get": {
+        "operationId": "ExpensesController_findAll",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categories",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "comida",
+                  "hospedagem",
+                  "transporte",
+                  "passeios",
+                  "compras",
+                  "outros"
+                ]
+              }
+            }
+          },
+          {
+            "name": "memberIds",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "newest",
+              "type": "string",
+              "enum": [
+                "newest",
+                "oldest",
+                "amount_desc",
+                "amount_asc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "expenses"
+        ]
+      },
+      "post": {
+        "operationId": "ExpensesController_create",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExpenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "expenses"
+        ]
+      }
+    },
+    "/expenses/{id}": {
+      "get": {
+        "operationId": "ExpensesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "expenses"
+        ]
+      },
+      "patch": {
+        "operationId": "ExpensesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExpenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "expenses"
+        ]
+      },
+      "delete": {
+        "operationId": "ExpensesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "expenses"
+        ]
+      }
+    },
+    "/trips/{id}/budget": {
+      "get": {
+        "operationId": "BudgetsController_getBudget",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "budgets"
+        ]
+      },
+      "put": {
+        "operationId": "BudgetsController_updateBudget",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBudgetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "budgets"
+        ]
+      }
+    },
+    "/trips/{id}/summary": {
+      "get": {
+        "operationId": "BudgetsController_getSummary",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "budgets"
+        ]
+      }
+    },
+    "/trips/{id}/balances": {
+      "get": {
+        "operationId": "SettlementsController_getBalances",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "settlements"
+        ]
+      }
+    },
+    "/trips/{id}/settlements": {
+      "get": {
+        "operationId": "SettlementsController_getSettlements",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "settlements"
+        ]
+      }
+    },
+    "/trips/{id}/settlements/settle": {
+      "post": {
+        "operationId": "SettlementsController_settle",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "settlements"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Gestor API",
+    "description": "API para gestão de gastos em viagens",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Ana Ribeiro"
+          },
+          "email": {
+            "type": "string",
+            "example": "ana@email.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "senha123"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "ana@email.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "senha123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "CreateTripDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Itália em família"
+          },
+          "initials": {
+            "type": "string",
+            "example": "IT"
+          },
+          "startDate": {
+            "type": "string",
+            "example": "2026-06-10"
+          },
+          "endDate": {
+            "type": "string",
+            "example": "2026-06-22"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planning",
+              "active",
+              "closed"
+            ],
+            "default": "planning"
+          },
+          "baseCurrency": {
+            "type": "string",
+            "enum": [
+              "BRL",
+              "ARS"
+            ],
+            "default": "BRL"
+          },
+          "totalBudget": {
+            "type": "string",
+            "example": "15000.00"
+          }
+        },
+        "required": [
+          "name",
+          "initials",
+          "startDate",
+          "endDate"
+        ]
+      },
+      "TripAccessDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "EDITOR",
+              "VIEWER"
+            ]
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "READ",
+                "WRITE",
+                "MANAGE_MEMBERS",
+                "MANAGE_BUDGET",
+                "DELETE_TRIP",
+                "MANAGE_SETTLEMENTS"
+              ]
+            }
+          }
+        },
+        "required": [
+          "role",
+          "permissions"
+        ]
+      },
+      "UpdateTripDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Itália em família"
+          },
+          "initials": {
+            "type": "string",
+            "example": "IT"
+          },
+          "startDate": {
+            "type": "string",
+            "example": "2026-06-10"
+          },
+          "endDate": {
+            "type": "string",
+            "example": "2026-06-22"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planning",
+              "active",
+              "closed"
+            ],
+            "default": "planning"
+          },
+          "baseCurrency": {
+            "type": "string",
+            "enum": [
+              "BRL",
+              "ARS"
+            ],
+            "default": "BRL"
+          },
+          "totalBudget": {
+            "type": "string",
+            "example": "15000.00"
+          }
+        }
+      },
+      "CreateMemberDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Ana"
+          },
+          "initials": {
+            "type": "string",
+            "example": "AN"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "EDITOR",
+              "VIEWER"
+            ],
+            "default": "EDITOR"
+          }
+        },
+        "required": [
+          "name",
+          "initials"
+        ]
+      },
+      "UpdateMemberDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Ana"
+          },
+          "initials": {
+            "type": "string",
+            "example": "AN"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "EDITOR",
+              "VIEWER"
+            ],
+            "default": "EDITOR"
+          }
+        }
+      },
+      "ExpenseSplitDto": {
+        "type": "object",
+        "properties": {
+          "memberId": {
+            "type": "string"
+          },
+          "share": {
+            "type": "string",
+            "example": "50.00"
+          }
+        },
+        "required": [
+          "memberId",
+          "share"
+        ]
+      },
+      "CreateExpenseDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Jantar na trattoria"
+          },
+          "amount": {
+            "type": "string",
+            "example": "120.50"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "BRL",
+              "ARS"
+            ],
+            "example": "ARS"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-06-14"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "comida",
+              "hospedagem",
+              "transporte",
+              "passeios",
+              "compras",
+              "outros"
+            ]
+          },
+          "payerId": {
+            "type": "string"
+          },
+          "receiptUrl": {
+            "type": "string"
+          },
+          "splits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpenseSplitDto"
+            }
+          }
+        },
+        "required": [
+          "description",
+          "amount",
+          "currency",
+          "date",
+          "category",
+          "payerId",
+          "splits"
+        ]
+      },
+      "UpdateExpenseDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Jantar na trattoria"
+          },
+          "amount": {
+            "type": "string",
+            "example": "120.50"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "BRL",
+              "ARS"
+            ],
+            "example": "ARS"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-06-14"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "comida",
+              "hospedagem",
+              "transporte",
+              "passeios",
+              "compras",
+              "outros"
+            ]
+          },
+          "payerId": {
+            "type": "string"
+          },
+          "receiptUrl": {
+            "type": "string"
+          },
+          "splits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpenseSplitDto"
+            }
+          }
+        }
+      },
+      "CategoryBudgetItemDto": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "comida",
+              "hospedagem",
+              "transporte",
+              "passeios",
+              "compras",
+              "outros"
+            ]
+          },
+          "limitAmount": {
+            "type": "string",
+            "example": "3000.00"
+          }
+        },
+        "required": [
+          "category",
+          "limitAmount"
+        ]
+      },
+      "UpdateBudgetDto": {
+        "type": "object",
+        "properties": {
+          "totalBudget": {
+            "type": "string",
+            "example": "15000.00"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryBudgetItemDto"
+            }
+          }
+        },
+        "required": [
+          "categories"
+        ]
+      },
+      "SettlementItemDto": {
+        "type": "object",
+        "properties": {
+          "fromMemberId": {
+            "type": "string"
+          },
+          "toMemberId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "example": "150.00"
+          }
+        },
+        "required": [
+          "fromMemberId",
+          "toMemberId",
+          "amount"
+        ]
+      },
+      "SettleDto": {
+        "type": "object",
+        "properties": {
+          "settlements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettlementItemDto"
+            }
+          }
+        },
+        "required": [
+          "settlements"
+        ]
+      }
+    }
+  }
+}

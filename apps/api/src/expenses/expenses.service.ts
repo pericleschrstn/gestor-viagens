@@ -9,6 +9,8 @@ import {
   PaginatedResult,
   paginate,
 } from '../common/interfaces/paginated-result.interface';
+import { TripPermission } from '../common/enums/trip-permission.enum';
+import { TripRbacService } from '../common/rbac/trip-rbac.service';
 import { parseDecimal } from '../common/utils/currency.util';
 import { MembersService } from '../members/members.service';
 import { TripsService } from '../trips/trips.service';
@@ -30,14 +32,19 @@ export class ExpensesService {
     private readonly splitRepository: Repository<ExpenseSplit>,
     private readonly tripsService: TripsService,
     private readonly membersService: MembersService,
+    private readonly tripRbacService: TripRbacService,
   ) {}
 
   async findAllByTrip(
     tripId: string,
-    ownerId: string,
+    userId: string,
     query: ListExpensesQueryDto,
   ): Promise<PaginatedResult<Expense>> {
-    await this.tripsService.findOneForOwner(tripId, ownerId);
+    await this.tripRbacService.assertPermission(
+      userId,
+      tripId,
+      TripPermission.READ,
+    );
 
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
@@ -75,14 +82,16 @@ export class ExpensesService {
       });
     }
 
-    if (query.category) {
-      qb.andWhere('expense.category = :category', { category: query.category });
+    if (query.categories?.length) {
+      qb.andWhere('expense.category IN (:...categories)', {
+        categories: query.categories,
+      });
     }
 
-    if (query.memberId) {
+    if (query.memberIds?.length) {
       qb.andWhere(
-        '(expense.payerId = :memberId OR splits.memberId = :memberId)',
-        { memberId: query.memberId },
+        '(expense.payerId IN (:...memberIds) OR splits.memberId IN (:...memberIds))',
+        { memberIds: query.memberIds },
       );
     }
 
@@ -115,30 +124,45 @@ export class ExpensesService {
     }
   }
 
-  async findOneForOwner(expenseId: string, ownerId: string): Promise<Expense> {
+  async findOneAccessible(expenseId: string, userId: string): Promise<Expense> {
     const expense = await this.expenseRepository.findOne({
       where: { id: expenseId },
       relations: ['trip', 'payer', 'splits', 'splits.member'],
     });
 
-    if (!expense || expense.trip.ownerId !== ownerId) {
+    if (!expense) {
       throw new NotFoundException('Expense not found');
     }
+
+    await this.tripRbacService.assertPermission(
+      userId,
+      expense.tripId,
+      TripPermission.READ,
+    );
 
     return expense;
   }
 
+  /** @deprecated use findOneAccessible */
+  async findOneForOwner(expenseId: string, ownerId: string): Promise<Expense> {
+    return this.findOneAccessible(expenseId, ownerId);
+  }
+
   async create(
     tripId: string,
-    ownerId: string,
+    userId: string,
     dto: CreateExpenseDto,
   ): Promise<Expense> {
-    await this.tripsService.findOneForOwner(tripId, ownerId);
-    await this.membersService.findMemberForOwner(dto.payerId, ownerId);
+    await this.tripRbacService.assertPermission(
+      userId,
+      tripId,
+      TripPermission.WRITE,
+    );
+    await this.membersService.findMemberForTrip(dto.payerId, tripId, userId);
     this.validateSplits(dto.amount, dto.splits);
 
     for (const split of dto.splits) {
-      await this.membersService.findMemberForOwner(split.memberId, ownerId);
+      await this.membersService.findMemberForTrip(split.memberId, tripId, userId);
     }
 
     const expense = this.expenseRepository.create({
@@ -163,20 +187,33 @@ export class ExpensesService {
 
   async update(
     expenseId: string,
-    ownerId: string,
+    userId: string,
     dto: UpdateExpenseDto,
   ): Promise<Expense> {
-    const expense = await this.findOneForOwner(expenseId, ownerId);
+    const expense = await this.findOneAccessible(expenseId, userId);
+    await this.tripRbacService.assertPermission(
+      userId,
+      expense.tripId,
+      TripPermission.WRITE,
+    );
 
     if (dto.payerId) {
-      await this.membersService.findMemberForOwner(dto.payerId, ownerId);
+      await this.membersService.findMemberForTrip(
+        dto.payerId,
+        expense.tripId,
+        userId,
+      );
     }
 
     if (dto.splits) {
       const amount = dto.amount ?? expense.amount;
       this.validateSplits(amount, dto.splits);
       for (const split of dto.splits) {
-        await this.membersService.findMemberForOwner(split.memberId, ownerId);
+        await this.membersService.findMemberForTrip(
+          split.memberId,
+          expense.tripId,
+          userId,
+        );
       }
       await this.splitRepository.delete({ expenseId: expense.id });
       expense.splits = dto.splits.map((split) =>
@@ -201,8 +238,13 @@ export class ExpensesService {
     return this.expenseRepository.save(expense);
   }
 
-  async remove(expenseId: string, ownerId: string): Promise<void> {
-    const expense = await this.findOneForOwner(expenseId, ownerId);
+  async remove(expenseId: string, userId: string): Promise<void> {
+    const expense = await this.findOneAccessible(expenseId, userId);
+    await this.tripRbacService.assertPermission(
+      userId,
+      expense.tripId,
+      TripPermission.WRITE,
+    );
     await this.expenseRepository.remove(expense);
   }
 
