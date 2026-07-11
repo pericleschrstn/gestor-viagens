@@ -12,7 +12,9 @@
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/database/data-source.ts",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/database/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts",
-    "smoke-test": "node scripts/smoke-test.mjs"
+    "smoke-test": "node scripts/smoke-test.mjs",
+    "openapi:generate": "ts-node --transpile-only scripts/generate-openapi.ts",
+    "test": "npx tsx --test src/common/rbac/role-permissions.test.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.12",

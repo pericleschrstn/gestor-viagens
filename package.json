@@ -11,7 +11,9 @@
     "format": "turbo format",
     "typecheck": "turbo typecheck",
     "db:up": "docker compose --env-file apps/api/.env up -d",
-    "db:migrate": "pnpm --filter api migration:run"
+    "db:migrate": "pnpm --filter api migration:run",
+    "openapi:generate": "pnpm --filter api openapi:generate",
+    "test": "turbo test"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
