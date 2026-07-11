@@ -10,7 +10,9 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { TripAccessGuard } from '../common/guards/trip-access.guard';
+import { RequireTripPermission } from '../common/decorators/require-trip-permission.decorator';
+import { TripPermission } from '../common/enums/trip-permission.enum';
+import { TripRbacGuard } from '../common/guards/trip-rbac.guard';
 import { User } from '../users/entities/user.entity';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
@@ -22,13 +24,15 @@ import { MembersService } from './members.service';
 export class MembersController {
   constructor(private readonly membersService: MembersService) {}
 
-  @UseGuards(TripAccessGuard)
+  @UseGuards(TripRbacGuard)
+  @RequireTripPermission(TripPermission.READ)
   @Get('trips/:id/members')
   findAll(@Param('id') tripId: string, @CurrentUser() user: User) {
     return this.membersService.findAllByTrip(tripId, user.id);
   }
 
-  @UseGuards(TripAccessGuard)
+  @UseGuards(TripRbacGuard)
+  @RequireTripPermission(TripPermission.MANAGE_MEMBERS)
   @Post('trips/:id/members')
   create(
     @Param('id') tripId: string,

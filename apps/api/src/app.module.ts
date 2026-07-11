@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TripRbacModule } from './common/rbac/trip-rbac.module';
 import { AuthModule } from './auth/auth.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -25,6 +26,7 @@ import { UsersModule } from './users/users.module';
         ...configService.getOrThrow('database'),
       }),
     }),
+    TripRbacModule,
     UsersModule,
     AuthModule,
     TripsModule,

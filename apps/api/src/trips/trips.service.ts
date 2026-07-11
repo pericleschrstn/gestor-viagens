@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TripPermission } from '../common/enums/trip-permission.enum';
+import { TripRbacService } from '../common/rbac/trip-rbac.service';
 import { TripStatus } from '../common/enums/trip-status.enum';
 import { Currency } from '../common/enums/currency.enum';
 import { User } from '../users/entities/user.entity';
@@ -13,18 +15,33 @@ export class TripsService {
   constructor(
     @InjectRepository(Trip)
     private readonly tripRepository: Repository<Trip>,
+    private readonly tripRbacService: TripRbacService,
   ) {}
 
-  findAllByOwner(ownerId: string): Promise<Trip[]> {
-    return this.tripRepository.find({
-      where: { ownerId },
-      order: { createdAt: 'DESC' },
-    });
+  findAllAccessible(userId: string): Promise<Trip[]> {
+    return this.tripRepository
+      .createQueryBuilder('trip')
+      .leftJoin('trip_members', 'member', 'member.trip_id = trip.id')
+      .where('trip.owner_id = :userId', { userId })
+      .orWhere('member.user_id = :userId', { userId })
+      .orderBy('trip.created_at', 'DESC')
+      .getMany();
   }
 
-  async findOneForOwner(id: string, ownerId: string): Promise<Trip> {
+  /** @deprecated use findAllAccessible */
+  findAllByOwner(ownerId: string): Promise<Trip[]> {
+    return this.findAllAccessible(ownerId);
+  }
+
+  async findOneAccessible(id: string, userId: string): Promise<Trip> {
+    await this.tripRbacService.assertPermission(
+      userId,
+      id,
+      TripPermission.READ,
+    );
+
     const trip = await this.tripRepository.findOne({
-      where: { id, ownerId },
+      where: { id },
       relations: ['members'],
     });
 
@@ -33,6 +50,11 @@ export class TripsService {
     }
 
     return trip;
+  }
+
+  /** @deprecated use findOneAccessible */
+  async findOneForOwner(id: string, ownerId: string): Promise<Trip> {
+    return this.findOneAccessible(id, ownerId);
   }
 
   async create(owner: User, dto: CreateTripDto): Promise<Trip> {
@@ -50,8 +72,14 @@ export class TripsService {
     return this.tripRepository.save(trip);
   }
 
-  async update(id: string, ownerId: string, dto: UpdateTripDto): Promise<Trip> {
-    const trip = await this.findOneForOwner(id, ownerId);
+  async update(id: string, userId: string, dto: UpdateTripDto): Promise<Trip> {
+    await this.tripRbacService.assertPermission(
+      userId,
+      id,
+      TripPermission.DELETE_TRIP,
+    );
+
+    const trip = await this.findOneAccessible(id, userId);
     Object.assign(trip, {
       ...dto,
       initials: dto.initials ? dto.initials.toUpperCase() : trip.initials,
@@ -59,8 +87,14 @@ export class TripsService {
     return this.tripRepository.save(trip);
   }
 
-  async remove(id: string, ownerId: string): Promise<void> {
-    const trip = await this.findOneForOwner(id, ownerId);
+  async remove(id: string, userId: string): Promise<void> {
+    await this.tripRbacService.assertPermission(
+      userId,
+      id,
+      TripPermission.DELETE_TRIP,
+    );
+
+    const trip = await this.findOneAccessible(id, userId);
     await this.tripRepository.remove(trip);
   }
 }

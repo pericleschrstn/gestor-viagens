@@ -11,7 +11,9 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { TripAccessGuard } from '../common/guards/trip-access.guard';
+import { RequireTripPermission } from '../common/decorators/require-trip-permission.decorator';
+import { TripPermission } from '../common/enums/trip-permission.enum';
+import { TripRbacGuard } from '../common/guards/trip-rbac.guard';
 import { User } from '../users/entities/user.entity';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { ListExpensesQueryDto } from './dto/list-expenses-query.dto';
@@ -24,7 +26,8 @@ import { ExpensesService } from './expenses.service';
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
-  @UseGuards(TripAccessGuard)
+  @UseGuards(TripRbacGuard)
+  @RequireTripPermission(TripPermission.READ)
   @Get('trips/:id/expenses')
   findAll(
     @Param('id') tripId: string,
@@ -34,7 +37,8 @@ export class ExpensesController {
     return this.expensesService.findAllByTrip(tripId, user.id, query);
   }
 
-  @UseGuards(TripAccessGuard)
+  @UseGuards(TripRbacGuard)
+  @RequireTripPermission(TripPermission.WRITE)
   @Post('trips/:id/expenses')
   create(
     @Param('id') tripId: string,
@@ -46,7 +50,7 @@ export class ExpensesController {
 
   @Get('expenses/:id')
   findOne(@Param('id') expenseId: string, @CurrentUser() user: User) {
-    return this.expensesService.findOneForOwner(expenseId, user.id);
+    return this.expensesService.findOneAccessible(expenseId, user.id);
   }
 
   @Patch('expenses/:id')

@@ -34,13 +34,13 @@ export class SettlementsService {
   ) {}
 
   async getBalances(tripId: string, ownerId: string) {
-    const trip = await this.tripsService.findOneForOwner(tripId, ownerId);
+    const trip = await this.tripsService.findOneAccessible(tripId, ownerId);
     const balances = await this.calculateBalances(trip);
     return balances;
   }
 
   async getSuggestedSettlements(tripId: string, ownerId: string) {
-    const trip = await this.tripsService.findOneForOwner(tripId, ownerId);
+    const trip = await this.tripsService.findOneAccessible(tripId, ownerId);
     const balances = await this.calculateBalances(trip);
     return this.minimizeTransfers(balances);
   }

@@ -25,7 +25,7 @@ export class BudgetsService {
   ) {}
 
   async getBudget(tripId: string, ownerId: string) {
-    const trip = await this.tripsService.findOneForOwner(tripId, ownerId);
+    const trip = await this.tripsService.findOneAccessible(tripId, ownerId);
     const categoryBudgets = await this.categoryBudgetRepository.find({
       where: { tripId },
       order: { category: 'ASC' },
@@ -44,7 +44,7 @@ export class BudgetsService {
   }
 
   async updateBudget(tripId: string, ownerId: string, dto: UpdateBudgetDto) {
-    const trip = await this.tripsService.findOneForOwner(tripId, ownerId);
+    const trip = await this.tripsService.findOneAccessible(tripId, ownerId);
 
     if (dto.totalBudget !== undefined) {
       trip.totalBudget = dto.totalBudget;
@@ -66,7 +66,7 @@ export class BudgetsService {
   }
 
   async getSummary(tripId: string, ownerId: string) {
-    const trip = await this.tripsService.findOneForOwner(tripId, ownerId);
+    const trip = await this.tripsService.findOneAccessible(tripId, ownerId);
     const expenses = await this.expenseRepository.find({
       where: { tripId },
       relations: ['payer', 'splits', 'splits.member'],
