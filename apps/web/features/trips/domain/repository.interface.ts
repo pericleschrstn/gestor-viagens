@@ -1,8 +1,10 @@
-import type { Trip, TripMember, TripSummary } from "@/features/trips/domain/models"
+import type { CreateTripCommand, Trip, TripSummary, UpdateTripCommand } from "@/features/trips/domain/models"
 
 export interface TripRepository {
   list(): Promise<Trip[]>
   getById(tripId: string): Promise<Trip>
   getSummary(tripId: string): Promise<TripSummary>
-  listMembers(tripId: string): Promise<TripMember[]>
+  create(command: CreateTripCommand): Promise<Trip>
+  update(tripId: string, command: UpdateTripCommand): Promise<Trip>
+  delete(tripId: string): Promise<void>
 }

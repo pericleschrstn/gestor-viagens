@@ -45,6 +45,8 @@ apps/web/features/
 │   └── ui/           # Compound components + React Query hooks
 ├── budget/           # Orçamento — summary (leitura) + updateBudget (mutação)
 │   ├── domain/ application/ infra/ actions/ ui/
+├── members/          # Integrantes — listagem + CRUD (gate canManageMembers)
+│   ├── domain/ application/ infra/ actions/ ui/
 └── settlements/      # Divisão — balances + suggested (leitura) + settle (mutação)
     ├── domain/ application/ infra/ actions/ ui/
 ```
@@ -120,8 +122,8 @@ Server Actions retornam `Result` — nunca lançam exceção para o client.
 2. ✅ RBAC backend + endpoint `/trips/:id/access`
 3. ✅ Foundation feature `expenses`
 4. ✅ Tela de gastos + React Query + boundaries
-5. 🟡 Expansão: budget ✅ e division ✅ (com mutações); trips e members pendentes
-6. 🔲 Testes de contrato + lint de fronteiras
+5. ✅ Expansão: budget, division, trips e members (settings + mutações)
+6. ✅ Testes de contrato + lint de fronteiras
 
 ## Referências
 

@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   List,
   PieChart,
+  Settings,
   Users,
 } from "lucide-react"
 
@@ -34,6 +35,7 @@ const NAV_ITEMS: {
   { id: "expenses", label: "Gastos", icon: List },
   { id: "budget", label: "Orçamento", icon: PieChart },
   { id: "division", label: "Divisão", icon: Users },
+  { id: "settings", label: "Configurações", icon: Settings },
 ]
 
 type TripNavProps = {

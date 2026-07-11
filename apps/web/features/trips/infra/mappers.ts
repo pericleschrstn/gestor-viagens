@@ -21,7 +21,7 @@ export const apiTripSchema = z.object({
   createdAt: z.string(),
 })
 
-export const apiTripMemberSchema = z.object({
+const apiTripMemberSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   initials: z.string(),
@@ -74,13 +74,20 @@ export function mapTrip(dto: z.infer<typeof apiTripSchema>) {
   }
 }
 
-export function mapTripMember(dto: z.infer<typeof apiTripMemberSchema>) {
-  return {
-    id: dto.id,
-    name: dto.name,
-    initials: dto.initials,
-  }
-}
+export const createTripCommandSchema = z.object({
+  name: z.string().min(2),
+  initials: z.string().min(1).max(4),
+  startDate: z.string(),
+  endDate: z.string(),
+  status: tripStatusSchema.optional(),
+  baseCurrency: currencySchema.optional(),
+  totalBudget: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/, "Informe um valor válido.")
+    .optional(),
+})
+
+export const updateTripCommandSchema = createTripCommandSchema.partial()
 
 export function mapTripSummary(dto: z.infer<typeof apiTripSummarySchema>) {
   return {

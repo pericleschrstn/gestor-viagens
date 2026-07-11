@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 
 import { authService } from "@/features/auth/application/auth.service"
 import { expensesService } from "@/features/expenses/application/expenses.service"
+import { membersService } from "@/features/members/application/members.service"
 import { isNotFound, isUnauthorized } from "@/features/shared/domain/errors"
 import { tripsService } from "@/features/trips/application/trips.service"
 
@@ -17,7 +18,7 @@ async function loadTripLayout(tripId: string) {
     tripsService.listTrips(),
     tripsService.getTrip(tripId),
     tripsService.getSummary(tripId),
-    tripsService.listMembers(tripId),
+    membersService.listMembers(tripId),
     authService.getSession(),
     expensesService.getTripAccess(tripId),
   ])

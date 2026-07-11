@@ -1,20 +1,21 @@
 import { cache } from "react"
 import { z } from "zod"
 
-import { serverFetch } from "@/features/shared/infra/http-client"
-
+import type {
+  CreateTripCommand,
+  UpdateTripCommand,
+} from "@/features/trips/domain/models"
 import type { TripRepository } from "@/features/trips/domain/repository.interface"
 import {
-  apiTripMemberSchema,
   apiTripSchema,
   apiTripSummarySchema,
+  createTripCommandSchema,
   mapTrip,
-  mapTripMember,
   mapTripSummary,
+  updateTripCommandSchema,
 } from "@/features/trips/infra/mappers"
+import { serverFetch } from "@/features/shared/infra/http-client"
 
-// React `cache` deduplica a listagem de viagens dentro de uma mesma requisição
-// (app shell + layout da viagem chamam `list()` no mesmo render).
 const fetchTrips = cache(async () => {
   const raw = await serverFetch<unknown>("/trips")
   return z.array(apiTripSchema).parse(raw).map(mapTrip)
@@ -35,9 +36,24 @@ export class HttpTripRepository implements TripRepository {
     return mapTripSummary(apiTripSummarySchema.parse(raw))
   }
 
-  async listMembers(tripId: string) {
-    const raw = await serverFetch<unknown>(`/trips/${tripId}/members`)
-    return z.array(apiTripMemberSchema).parse(raw).map(mapTripMember)
+  async create(command: CreateTripCommand) {
+    const raw = await serverFetch<unknown>("/trips", {
+      method: "POST",
+      body: JSON.stringify(createTripCommandSchema.parse(command)),
+    })
+    return mapTrip(apiTripSchema.parse(raw))
+  }
+
+  async update(tripId: string, command: UpdateTripCommand) {
+    const raw = await serverFetch<unknown>(`/trips/${tripId}`, {
+      method: "PATCH",
+      body: JSON.stringify(updateTripCommandSchema.parse(command)),
+    })
+    return mapTrip(apiTripSchema.parse(raw))
+  }
+
+  async delete(tripId: string) {
+    await serverFetch<unknown>(`/trips/${tripId}`, { method: "DELETE" })
   }
 }
 

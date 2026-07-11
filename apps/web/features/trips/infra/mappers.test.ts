@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { mapTrip, mapTripMember, mapTripSummary } from "../infra/mappers"
+import { mapTrip, mapTripSummary } from "../infra/mappers"
 
 test("mapTrip converts totalBudget string to number", () => {
   const domain = mapTrip({
@@ -36,20 +36,6 @@ test("mapTrip keeps null totalBudget", () => {
   })
 
   assert.equal(domain.totalBudget, null)
-})
-
-test("mapTripMember trims to id/name/initials", () => {
-  const domain = mapTripMember({
-    id: "550e8400-e29b-41d4-a716-446655440002",
-    name: "Ana",
-    initials: "AN",
-  })
-
-  assert.deepEqual(domain, {
-    id: "550e8400-e29b-41d4-a716-446655440002",
-    name: "Ana",
-    initials: "AN",
-  })
 })
 
 test("mapTripSummary normalizes recent amount to string and preserves byDay", () => {

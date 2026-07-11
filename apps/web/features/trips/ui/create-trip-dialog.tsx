@@ -1,0 +1,225 @@
+"use client"
+
+import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
+import { Plus } from "lucide-react"
+import { toast } from "sonner"
+
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { createTripAction } from "@/features/trips/actions/trip.actions"
+import type { Currency } from "@/features/expenses/domain/models"
+import { tripViewHref } from "@/lib/trip-routes"
+
+const CURRENCIES: Currency[] = ["BRL", "ARS"]
+
+type CreateTripDialogProps = {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  trigger?: React.ReactNode
+  onCreated?: (tripId: string) => void
+}
+
+function defaultDates() {
+  const start = new Date()
+  const end = new Date()
+  end.setDate(end.getDate() + 7)
+  return {
+    startDate: start.toISOString().slice(0, 10),
+    endDate: end.toISOString().slice(0, 10),
+  }
+}
+
+export function CreateTripDialog({
+  open: controlledOpen,
+  onOpenChange,
+  trigger,
+  onCreated,
+}: CreateTripDialogProps) {
+  const router = useRouter()
+  const [internalOpen, setInternalOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  const open = controlledOpen ?? internalOpen
+  const setOpen = onOpenChange ?? setInternalOpen
+
+  const defaults = defaultDates()
+  const [name, setName] = useState("")
+  const [initials, setInitials] = useState("")
+  const [startDate, setStartDate] = useState(defaults.startDate)
+  const [endDate, setEndDate] = useState(defaults.endDate)
+  const [baseCurrency, setBaseCurrency] = useState<Currency>("BRL")
+
+  function resetForm() {
+    const dates = defaultDates()
+    setName("")
+    setInitials("")
+    setStartDate(dates.startDate)
+    setEndDate(dates.endDate)
+    setBaseCurrency("BRL")
+  }
+
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+
+    startTransition(async () => {
+      const result = await createTripAction({
+        name: name.trim(),
+        initials: initials.trim().toUpperCase(),
+        startDate,
+        endDate,
+        baseCurrency,
+      })
+
+      if (!result.ok) {
+        toast.error(result.error.message)
+        return
+      }
+
+      toast.success("Viagem criada")
+      setOpen(false)
+      resetForm()
+      onCreated?.(result.data.id)
+      router.push(tripViewHref(result.data.id, "dashboard"))
+    })
+  }
+
+  return (
+    <>
+      {trigger ? (
+        <span
+          className="contents"
+          onClick={() => setOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              setOpen(true)
+            }
+          }}
+          role="presentation"
+        >
+          {trigger}
+        </span>
+      ) : (
+        <Button size="sm" variant="outline" className="gap-2" onClick={() => setOpen(true)}>
+          <Plus className="size-3.5" />
+          Nova viagem
+        </Button>
+      )}
+
+      <Dialog
+        open={open}
+        onOpenChange={(next) => {
+          setOpen(next)
+          if (!next) resetForm()
+        }}
+      >
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle>Nova viagem</DialogTitle>
+            <DialogDescription>
+              Crie uma viagem para começar a registrar gastos.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="trip-name">Nome</Label>
+              <Input
+                id="trip-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Itália em família"
+                required
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="trip-initials">Iniciais</Label>
+                <Input
+                  id="trip-initials"
+                  maxLength={4}
+                  value={initials}
+                  onChange={(event) => setInitials(event.target.value)}
+                  placeholder="IT"
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="trip-currency">Moeda</Label>
+                <Select
+                  value={baseCurrency}
+                  onValueChange={(value) => setBaseCurrency(value as Currency)}
+                >
+                  <SelectTrigger id="trip-currency">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CURRENCIES.map((currency) => (
+                      <SelectItem key={currency} value={currency}>
+                        {currency}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="trip-start">Início</Label>
+                <Input
+                  id="trip-start"
+                  type="date"
+                  value={startDate}
+                  onChange={(event) => setStartDate(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="trip-end">Fim</Label>
+                <Input
+                  id="trip-end"
+                  type="date"
+                  value={endDate}
+                  onChange={(event) => setEndDate(event.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={isPending}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Criando..." : "Criar viagem"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}

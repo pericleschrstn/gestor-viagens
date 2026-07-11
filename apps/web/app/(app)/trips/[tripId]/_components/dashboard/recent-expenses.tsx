@@ -1,5 +1,7 @@
 "use client"
 
+import Link from "next/link"
+
 import {
   Card,
   CardContent,
@@ -9,12 +11,13 @@ import {
 } from "@/components/ui/card"
 import { CATEGORY_CONFIG } from "@/lib/categories"
 import { categoryLabel, formatShortDate } from "@/lib/format"
+import { tripViewHref } from "@/lib/trip-routes"
 
 import { useTripApp } from "../trip-app"
 
 export function RecentExpenses() {
   const {
-    state: { summary },
+    state: { trip, summary },
     meta: { formatMoney },
   } = useTripApp()
 
@@ -25,7 +28,12 @@ export function RecentExpenses() {
           <CardTitle className="text-sm font-medium">Gastos recentes</CardTitle>
           <CardDescription>Últimos lançamentos da viagem</CardDescription>
         </div>
-        <span className="text-muted-foreground text-xs">Ver todos (em breve)</span>
+        <Link
+          href={tripViewHref(trip.id, "expenses")}
+          className="text-muted-foreground hover:text-foreground text-xs transition-colors"
+        >
+          Ver todos
+        </Link>
       </CardHeader>
       <CardContent className="p-0">
         {summary.recent.length === 0 ? (

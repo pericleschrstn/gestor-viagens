@@ -59,7 +59,7 @@ function buildEqualSplits(amount: string, memberIds: string[]) {
 export function ExpenseFormDialog() {
   const {
     state: { trip, members, expenseDialogOpen, capabilities },
-    actions: { closeExpenseDialog, refresh, invalidateExpenses },
+    actions: { closeExpenseDialog, invalidateExpenses },
   } = useTripApp()
 
   const [description, setDescription] = useState("")
@@ -132,7 +132,6 @@ export function ExpenseFormDialog() {
       toast.success("Gasto adicionado")
       closeExpenseDialog()
       invalidateExpenses()
-      refresh()
     })
   }
 

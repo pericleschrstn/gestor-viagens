@@ -10,7 +10,7 @@
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
-    "test": "npx tsx --test features/expenses/infra/mappers.test.ts features/trips/infra/mappers.test.ts features/auth/infra/mappers.test.ts"
+    "test": "npx tsx --test features/expenses/infra/mappers.test.ts features/trips/infra/mappers.test.ts features/auth/infra/mappers.test.ts features/budget/infra/mappers.test.ts features/settlements/infra/mappers.test.ts features/shared/infra/access.mapper.test.ts features/shared/domain/capabilities.test.ts features/members/infra/mappers.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

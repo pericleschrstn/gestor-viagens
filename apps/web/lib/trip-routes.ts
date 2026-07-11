@@ -1,10 +1,11 @@
-export type TripView = "dashboard" | "expenses" | "budget" | "division"
+export type TripView = "dashboard" | "expenses" | "budget" | "division" | "settings"
 
 const TRIP_VIEW_SEGMENTS: TripView[] = [
   "dashboard",
   "expenses",
   "budget",
   "division",
+  "settings",
 ]
 
 export function getTripIdFromPathname(pathname: string): string | null {
@@ -39,4 +40,5 @@ export const TRIP_VIEW_LABELS: Record<TripView, string> = {
   expenses: "Gastos",
   budget: "Orçamento",
   division: "Divisão",
+  settings: "Configurações",
 }

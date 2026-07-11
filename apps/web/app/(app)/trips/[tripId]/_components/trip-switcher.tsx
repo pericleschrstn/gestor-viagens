@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useState } from "react"
 import { Check, ChevronDown, Plus } from "lucide-react"
 
 import {
@@ -22,6 +23,7 @@ import {
 import { cn } from "@/lib/utils"
 import { formatTripDates, tripStatusLabel } from "@/lib/format"
 import type { Trip } from "@/features/trips/domain/models"
+import { CreateTripDialog } from "@/features/trips/ui/create-trip-dialog"
 import { tripHref } from "@/lib/trip-routes"
 
 type TripSwitcherProps = {
@@ -30,8 +32,11 @@ type TripSwitcherProps = {
 }
 
 export function TripSwitcher({ trip, trips }: TripSwitcherProps) {
+  const [createOpen, setCreateOpen] = useState(false)
+
   return (
-    <SidebarMenu>
+    <>
+      <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -63,14 +68,20 @@ export function TripSwitcher({ trip, trips }: TripSwitcherProps) {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem disabled className="gap-2">
+            <DropdownMenuItem
+              className="gap-2"
+              onSelect={() => setCreateOpen(true)}
+            >
               <Plus />
-              Nova viagem (em breve)
+              Nova viagem
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+
+    <CreateTripDialog open={createOpen} onOpenChange={setCreateOpen} />
+    </>
   )
 }
 

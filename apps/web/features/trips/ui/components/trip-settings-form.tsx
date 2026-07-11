@@ -1,0 +1,229 @@
+"use client"
+
+import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
+import { Trash2 } from "lucide-react"
+import { toast } from "sonner"
+
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import type { Currency } from "@/features/expenses/domain/models"
+import {
+  deleteTripAction,
+  updateTripAction,
+} from "@/features/trips/actions/trip.actions"
+import type { Trip } from "@/features/trips/domain/models"
+import type { TripStatus } from "@/features/trips/domain/schemas"
+import type { TripCapabilities } from "@/features/shared/domain/capabilities"
+
+const CURRENCIES: Currency[] = ["BRL", "ARS"]
+
+const STATUS_OPTIONS: { value: TripStatus; label: string }[] = [
+  { value: "planning", label: "Planejamento" },
+  { value: "active", label: "Em andamento" },
+  { value: "closed", label: "Encerrada" },
+]
+
+type TripSettingsFormProps = {
+  trip: Trip
+  capabilities: TripCapabilities
+}
+
+export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+  const [isDeleting, startDeleteTransition] = useTransition()
+
+  const [name, setName] = useState(trip.name)
+  const [initials, setInitials] = useState(trip.initials)
+  const [startDate, setStartDate] = useState(trip.startDate)
+  const [endDate, setEndDate] = useState(trip.endDate)
+  const [status, setStatus] = useState<TripStatus>(trip.status)
+  const [baseCurrency, setBaseCurrency] = useState<Currency>(trip.baseCurrency)
+
+  const canEdit = capabilities.canDeleteTrip
+
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+    if (!canEdit) return
+
+    startTransition(async () => {
+      const result = await updateTripAction(
+        trip.id,
+        {
+          name: name.trim(),
+          initials: initials.trim().toUpperCase(),
+          startDate,
+          endDate,
+          status,
+          baseCurrency,
+        },
+        capabilities,
+      )
+
+      if (!result.ok) {
+        toast.error(result.error.message)
+        return
+      }
+
+      toast.success("Viagem atualizada")
+      router.refresh()
+    })
+  }
+
+  function handleDelete() {
+    if (!canEdit) return
+    if (!window.confirm("Excluir esta viagem? Esta ação não pode ser desfeita.")) {
+      return
+    }
+
+    startDeleteTransition(async () => {
+      const result = await deleteTripAction(trip.id, capabilities)
+
+      if (!result.ok) {
+        toast.error(result.error.message)
+        return
+      }
+
+      toast.success("Viagem excluída")
+      router.push("/")
+    })
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium">Dados da viagem</CardTitle>
+        <CardDescription>
+          {canEdit
+            ? "Edite as informações gerais da viagem."
+            : "Você não tem permissão para editar esta viagem."}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="flex max-w-lg flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="settings-name">Nome</Label>
+            <Input
+              id="settings-name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              disabled={!canEdit || isPending}
+              required
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="settings-initials">Iniciais</Label>
+              <Input
+                id="settings-initials"
+                maxLength={4}
+                value={initials}
+                onChange={(event) => setInitials(event.target.value)}
+                disabled={!canEdit || isPending}
+                required
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="settings-status">Status</Label>
+              <Select
+                value={status}
+                onValueChange={(value) => setStatus(value as TripStatus)}
+                disabled={!canEdit || isPending}
+              >
+                <SelectTrigger id="settings-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="settings-start">Início</Label>
+              <Input
+                id="settings-start"
+                type="date"
+                value={startDate}
+                onChange={(event) => setStartDate(event.target.value)}
+                disabled={!canEdit || isPending}
+                required
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="settings-end">Fim</Label>
+              <Input
+                id="settings-end"
+                type="date"
+                value={endDate}
+                onChange={(event) => setEndDate(event.target.value)}
+                disabled={!canEdit || isPending}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="settings-currency">Moeda base</Label>
+            <Select
+              value={baseCurrency}
+              onValueChange={(value) => setBaseCurrency(value as Currency)}
+              disabled={!canEdit || isPending}
+            >
+              <SelectTrigger id="settings-currency">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCIES.map((currency) => (
+                  <SelectItem key={currency} value={currency}>
+                    {currency}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {canEdit ? (
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Salvando..." : "Salvar alterações"}
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={isDeleting}
+                onClick={handleDelete}
+              >
+                <Trash2 className="size-3.5" />
+                {isDeleting ? "Excluindo..." : "Excluir viagem"}
+              </Button>
+            </div>
+          ) : null}
+        </form>
+      </CardContent>
+    </Card>
+  )
+}

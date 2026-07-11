@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -9,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { AppPageHeader } from "@/components/app-page-header"
+import { CreateTripDialog } from "@/features/trips/ui/create-trip-dialog"
 
 type HomeEmptyStateProps = {
   userName: string
@@ -23,14 +23,21 @@ export function HomeEmptyState({ userName }: HomeEmptyStateProps) {
           <CardHeader>
             <CardTitle>Olá, {userName}</CardTitle>
             <CardDescription>
-              Você ainda não tem viagens. Crie uma viagem pela API ou adicione
-              dados de seed para começar.
+              Você ainda não tem viagens. Crie a primeira para começar a
+              registrar gastos.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button disabled className="w-full">
-              Nova viagem (em breve)
-            </Button>
+            <CreateTripDialog
+              trigger={
+                <button
+                  type="button"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-9 w-full items-center justify-center rounded-md px-4 text-sm font-medium"
+                >
+                  Nova viagem
+                </button>
+              }
+            />
           </CardContent>
         </Card>
       </div>
