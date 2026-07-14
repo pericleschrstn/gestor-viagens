@@ -31,6 +31,14 @@ export function formatShortDate(date: string): string {
   }).format(new Date(`${date}T12:00:00`))
 }
 
+export function formatDate(date: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(`${date}T12:00:00`))
+}
+
 export function categoryLabel(category: ExpenseCategory): string {
   const labels: Record<ExpenseCategory, string> = {
     comida: "Comida",
