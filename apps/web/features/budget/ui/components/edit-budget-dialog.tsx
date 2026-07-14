@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Spinner } from "@/components/ui/spinner"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { BudgetSummary } from "@/features/budget/domain/models"
@@ -136,7 +137,7 @@ export function EditBudgetDialog({
             })}
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter>
             <Button
               type="button"
               variant="outline"
@@ -147,6 +148,7 @@ export function EditBudgetDialog({
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? "Salvando..." : "Salvar"}
+              {isPending ? <Spinner data-icon="inline-end" /> : null}
             </Button>
           </DialogFooter>
         </form>

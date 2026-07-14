@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Spinner } from "@/components/ui/spinner"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -144,7 +145,7 @@ export function MemberFormDialog({
             </Select>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter>
             <Button
               type="button"
               variant="outline"
@@ -155,6 +156,7 @@ export function MemberFormDialog({
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? "Salvando..." : isEditing ? "Salvar" : "Adicionar"}
+              {isPending ? <Spinner data-icon="inline-end" /> : null}
             </Button>
           </DialogFooter>
         </form>

@@ -6,6 +6,7 @@ import { Upload } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { DatePicker } from "@/components/ui/date-picker"
+import { Spinner } from "@/components/ui/spinner"
 import {
   Dialog,
   DialogContent,
@@ -57,7 +58,7 @@ function buildEqualSplits(amount: string, memberIds: string[]) {
 export function ExpenseFormDialog() {
   const {
     state: { trip, members, expenseDialogOpen, capabilities },
-    actions: { closeExpenseDialog, invalidateExpenses },
+    actions: { closeExpenseDialog, invalidateExpenses, refresh },
   } = useTripApp()
 
   const [description, setDescription] = useState("")
@@ -135,6 +136,7 @@ export function ExpenseFormDialog() {
       toast.success("Gasto adicionado")
       closeExpenseDialog()
       invalidateExpenses()
+      refresh()
     })
   }
 
@@ -289,7 +291,7 @@ export function ExpenseFormDialog() {
 
           {error ? <p className="text-destructive text-sm">{error}</p> : null}
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter>
             <Button
               type="button"
               variant="outline"
@@ -300,6 +302,7 @@ export function ExpenseFormDialog() {
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? "Salvando..." : "Salvar gasto"}
+              {isPending ? <Spinner data-icon="inline-end" /> : null}
             </Button>
           </DialogFooter>
         </form>

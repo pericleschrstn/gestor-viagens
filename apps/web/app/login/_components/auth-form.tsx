@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Spinner } from "@/components/ui/spinner"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -111,6 +112,7 @@ export function AuthForm() {
               : mode === "login"
                 ? "Entrar"
                 : "Criar conta"}
+            {isPending ? <Spinner data-icon="inline-end" /> : null}
           </Button>
         </form>
 

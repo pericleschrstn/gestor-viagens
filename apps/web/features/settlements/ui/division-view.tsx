@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Spinner } from "@/components/ui/spinner"
 import type { Currency } from "@/features/expenses/domain/schemas"
 import { useDivisionApp } from "@/features/settlements/ui/division-provider"
 import { formatMoney } from "@/lib/format"
@@ -122,10 +123,15 @@ export function DivisionView({ currency }: DivisionViewProps) {
                   disabled={mutations.settleMutation.isPending}
                   onClick={() => mutations.settleMutation.mutate(settlements)}
                 >
-                  <CheckCheck className="size-3.5" />
+                  {mutations.settleMutation.isPending ? null : (
+                    <CheckCheck data-icon="inline-start" />
+                  )}
                   {mutations.settleMutation.isPending
                     ? "Registrando..."
                     : "Marcar como quitado"}
+                  {mutations.settleMutation.isPending ? (
+                    <Spinner data-icon="inline-end" />
+                  ) : null}
                 </Button>
               ) : null}
             </>

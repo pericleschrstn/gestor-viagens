@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Spinner } from "@/components/ui/spinner"
 import type { Member } from "@/features/members/domain/models"
 import { MemberFormDialog } from "@/features/members/ui/components/member-form-dialog"
 import { useMembersApp } from "@/features/members/ui/members-provider"
@@ -115,7 +116,11 @@ export function MembersList() {
                         disabled={mutations.deleteMutation.isPending}
                         onClick={() => mutations.deleteMutation.mutate(member.id)}
                       >
-                        <Trash2 className="size-3.5" />
+                        {mutations.deleteMutation.isPending ? (
+                          <Spinner />
+                        ) : (
+                          <Trash2 />
+                        )}
                       </Button>
                     </div>
                   ) : null}

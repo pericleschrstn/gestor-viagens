@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { DatePicker } from "@/components/ui/date-picker"
+import { Spinner } from "@/components/ui/spinner"
 import {
   Dialog,
   DialogContent,
@@ -189,7 +190,7 @@ export function CreateTripDialog({
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter>
             <Button
               type="button"
               variant="outline"
@@ -205,6 +206,7 @@ export function CreateTripDialog({
               disabled={isPending}
             >
               {isPending ? "Criando..." : "Criar viagem"}
+              {isPending ? <Spinner data-icon="inline-end" /> : null}
             </Button>
           </DialogFooter>
         </form>

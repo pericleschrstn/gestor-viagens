@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Spinner } from "@/components/ui/spinner"
 import { useExpensesApp } from "@/features/expenses/ui/expenses-provider"
-import { categoryLabel, formatMoney } from "@/lib/format"
+import { categoryLabel, formatDate, formatMoney } from "@/lib/format"
 
 export function ExpensesList() {
   const {
@@ -66,7 +67,7 @@ export function ExpensesList() {
                 <Badge variant="secondary">{categoryLabel(expense.category)}</Badge>
               </div>
               <p className="text-muted-foreground mt-1 text-sm">
-                {expense.date} · Pago por {expense.payer.name}
+                {formatDate(expense.date)} · Pago por {expense.payer.name}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -81,7 +82,11 @@ export function ExpensesList() {
                   disabled={mutations.deleteMutation.isPending}
                   onClick={() => mutations.deleteMutation.mutate(expense.id)}
                 >
-                  <Trash2 className="size-4" />
+                  {mutations.deleteMutation.isPending ? (
+                    <Spinner />
+                  ) : (
+                    <Trash2 />
+                  )}
                 </Button>
               ) : null}
             </div>

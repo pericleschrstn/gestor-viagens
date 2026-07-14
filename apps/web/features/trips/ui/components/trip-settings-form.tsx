@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Spinner } from "@/components/ui/spinner"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -213,6 +214,7 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
             <div className="flex flex-wrap gap-2 pt-2">
               <Button type="submit" disabled={isPending}>
                 {isPending ? "Salvando..." : "Salvar alterações"}
+                {isPending ? <Spinner data-icon="inline-end" /> : null}
               </Button>
               <Button
                 type="button"
@@ -220,8 +222,9 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
                 disabled={isDeleting}
                 onClick={handleDelete}
               >
-                <Trash2 className="size-3.5" />
+                {isDeleting ? null : <Trash2 data-icon="inline-start" />}
                 {isDeleting ? "Excluindo..." : "Excluir viagem"}
+                {isDeleting ? <Spinner data-icon="inline-end" /> : null}
               </Button>
             </div>
           ) : null}
