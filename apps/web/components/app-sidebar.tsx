@@ -4,6 +4,7 @@ import { ChevronDown, LogOut, User } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 import { useAppShell } from "@/components/app-shell"
+import { ThemeMenuItems } from "@/components/theme-menu-items"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -93,6 +94,8 @@ export function AppSidebar() {
                   <User />
                   Minha conta
                 </DropdownMenuItem>
+
+                <ThemeMenuItems />
 
                 <DropdownMenuSeparator />
 
