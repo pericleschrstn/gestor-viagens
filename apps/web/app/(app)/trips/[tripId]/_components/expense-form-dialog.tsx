@@ -74,6 +74,11 @@ export function ExpenseFormDialog() {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
+  const payerItems = members.map((member) => ({
+    value: member.id,
+    label: member.name,
+  }))
+
   // Reinicia o formulário ao abrir o diálogo (padrão "ajustar estado quando uma
   // prop muda", sem efeito): https://react.dev/reference/react/useState#storing-information-from-previous-renders
   const [wasOpen, setWasOpen] = useState(false)
@@ -233,6 +238,7 @@ export function ExpenseFormDialog() {
           <div className="flex flex-col gap-2">
             <Label>Quem pagou</Label>
             <Select
+              items={payerItems}
               value={payerId}
               onValueChange={(value: string | null) =>
                 value && setPayerId(value)
