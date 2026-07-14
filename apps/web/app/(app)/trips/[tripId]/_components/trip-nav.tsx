@@ -10,13 +10,11 @@ import {
   Users,
 } from "lucide-react"
 
-import { useAppShell } from "@/components/app-shell"
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
@@ -45,9 +43,6 @@ type TripNavProps = {
 export function TripNav({ tripId }: TripNavProps) {
   const pathname = usePathname()
   const activeView = getTripViewFromPathname(pathname)
-  const { tripSidebar } = useAppShell()
-  const summary =
-    tripSidebar?.tripId === tripId ? tripSidebar.summary : null
 
   return (
     <SidebarGroup>
@@ -68,11 +63,6 @@ export function TripNav({ tripId }: TripNavProps) {
                   <Icon />
                   <span>{item.label}</span>
                 </SidebarMenuButton>
-                {item.id === "expenses" &&
-                summary &&
-                summary.recent.length > 0 ? (
-                  <SidebarMenuBadge>{summary.recent.length}</SidebarMenuBadge>
-                ) : null}
               </SidebarMenuItem>
             )
           })}

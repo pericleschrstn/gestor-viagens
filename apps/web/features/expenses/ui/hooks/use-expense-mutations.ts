@@ -1,8 +1,10 @@
 "use client"
 
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
+import { budgetKeys } from "@/features/budget/ui/query-keys"
 import {
   createExpenseAction,
   deleteExpenseAction,
@@ -13,13 +15,19 @@ import type {
   PaginatedExpenses,
 } from "@/features/expenses/domain/models"
 import { expenseKeys } from "@/features/expenses/ui/query-keys"
+import { settlementKeys } from "@/features/settlements/ui/query-keys"
 import type { TripCapabilities } from "@/features/shared/domain/capabilities"
 
 export function useExpenseMutations(tripId: string, capabilities: TripCapabilities) {
   const queryClient = useQueryClient()
+  const router = useRouter()
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: [...expenseKeys.all, tripId] })
+  const invalidate = () => {
+    void queryClient.invalidateQueries({ queryKey: [...expenseKeys.all, tripId] })
+    void queryClient.invalidateQueries({ queryKey: budgetKeys.summary(tripId) })
+    void queryClient.invalidateQueries({ queryKey: settlementKeys.trip(tripId) })
+    router.refresh()
+  }
 
   const createMutation = useMutation({
     mutationFn: async (command: CreateExpenseCommand) => {
@@ -29,7 +37,7 @@ export function useExpenseMutations(tripId: string, capabilities: TripCapabiliti
     },
     onSuccess: () => {
       toast.success("Gasto adicionado")
-      void invalidate()
+      invalidate()
     },
     onError: (error: Error) => toast.error(error.message),
   })
@@ -68,7 +76,7 @@ export function useExpenseMutations(tripId: string, capabilities: TripCapabiliti
       toast.error(error.message)
     },
     onSuccess: () => toast.success("Gasto removido"),
-    onSettled: () => void invalidate(),
+    onSettled: () => invalidate(),
   })
 
   return { createMutation, deleteMutation }
