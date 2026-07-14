@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Pencil, Plus, Trash2 } from "lucide-react"
 
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -37,6 +38,7 @@ export function MembersList() {
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingMember, setEditingMember] = useState<Member | null>(null)
+  const [memberToDelete, setMemberToDelete] = useState<Member | null>(null)
 
   const members = query.data ?? []
 
@@ -114,7 +116,7 @@ export function MembersList() {
                         variant="ghost"
                         className={cn("size-8 text-destructive")}
                         disabled={mutations.deleteMutation.isPending}
-                        onClick={() => mutations.deleteMutation.mutate(member.id)}
+                        onClick={() => setMemberToDelete(member)}
                       >
                         {mutations.deleteMutation.isPending ? (
                           <Spinner />
@@ -135,6 +137,26 @@ export function MembersList() {
         open={formOpen}
         onOpenChange={setFormOpen}
         member={editingMember}
+      />
+
+      <ConfirmDeleteDialog
+        open={memberToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setMemberToDelete(null)
+        }}
+        title="Excluir integrante?"
+        description={
+          memberToDelete
+            ? `Excluir "${memberToDelete.name}"? Esta ação não pode ser desfeita.`
+            : "Esta ação não pode ser desfeita."
+        }
+        isPending={mutations.deleteMutation.isPending}
+        onConfirm={() => {
+          if (!memberToDelete) return
+          const id = memberToDelete.id
+          setMemberToDelete(null)
+          mutations.deleteMutation.mutate(id)
+        }}
       />
     </>
   )

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -50,6 +51,7 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isDeleting, startDeleteTransition] = useTransition()
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   const [name, setName] = useState(trip.name)
   const [initials, setInitials] = useState(trip.initials)
@@ -90,9 +92,6 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
 
   function handleDelete() {
     if (!canEdit) return
-    if (!window.confirm("Excluir esta viagem? Esta ação não pode ser desfeita.")) {
-      return
-    }
 
     startDeleteTransition(async () => {
       const result = await deleteTripAction(trip.id, capabilities)
@@ -103,133 +102,145 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
       }
 
       toast.success("Viagem excluída")
+      setDeleteOpen(false)
       router.push("/")
     })
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-sm font-medium">Dados da viagem</CardTitle>
-        <CardDescription>
-          {canEdit
-            ? "Edite as informações gerais da viagem."
-            : "Você não tem permissão para editar esta viagem."}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="settings-name">Nome</Label>
-              <Input
-                id="settings-name"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                disabled={!canEdit || isPending}
-                required
-              />
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">Dados da viagem</CardTitle>
+          <CardDescription>
+            {canEdit
+              ? "Edite as informações gerais da viagem."
+              : "Você não tem permissão para editar esta viagem."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="settings-name">Nome</Label>
+                <Input
+                  id="settings-name"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  disabled={!canEdit || isPending}
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="settings-initials">Iniciais</Label>
+                <Input
+                  id="settings-initials"
+                  maxLength={4}
+                  value={initials}
+                  onChange={(event) => setInitials(event.target.value)}
+                  disabled={!canEdit || isPending}
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="settings-status">Status</Label>
+                <Select
+                  items={STATUS_OPTIONS}
+                  value={status}
+                  onValueChange={(value) => setStatus(value as TripStatus)}
+                  disabled={!canEdit || isPending}
+                >
+                  <SelectTrigger id="settings-status" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="settings-start">Início</Label>
+                <DatePicker
+                  id="settings-start"
+                  mode="single"
+                  value={startDate}
+                  onChange={(value) => {
+                    if (value) setStartDate(value)
+                  }}
+                  clearable={false}
+                  disabled={!canEdit || isPending}
+                  placeholder="Data de início"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="settings-end">Fim</Label>
+                <DatePicker
+                  id="settings-end"
+                  mode="single"
+                  value={endDate}
+                  onChange={(value) => {
+                    if (value) setEndDate(value)
+                  }}
+                  clearable={false}
+                  disabled={!canEdit || isPending}
+                  placeholder="Data de fim"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="settings-currency">Moeda base</Label>
+                <Select
+                  value={baseCurrency}
+                  onValueChange={(value) => setBaseCurrency(value as Currency)}
+                  disabled={!canEdit || isPending}
+                >
+                  <SelectTrigger id="settings-currency" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CURRENCIES.map((currency) => (
+                      <SelectItem key={currency} value={currency}>
+                        {currency}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="settings-initials">Iniciais</Label>
-              <Input
-                id="settings-initials"
-                maxLength={4}
-                value={initials}
-                onChange={(event) => setInitials(event.target.value)}
-                disabled={!canEdit || isPending}
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="settings-status">Status</Label>
-              <Select
-                items={STATUS_OPTIONS}
-                value={status}
-                onValueChange={(value) => setStatus(value as TripStatus)}
-                disabled={!canEdit || isPending}
-              >
-                <SelectTrigger id="settings-status" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="settings-start">Início</Label>
-              <DatePicker
-                id="settings-start"
-                mode="single"
-                value={startDate}
-                onChange={(value) => {
-                  if (value) setStartDate(value)
-                }}
-                clearable={false}
-                disabled={!canEdit || isPending}
-                placeholder="Data de início"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="settings-end">Fim</Label>
-              <DatePicker
-                id="settings-end"
-                mode="single"
-                value={endDate}
-                onChange={(value) => {
-                  if (value) setEndDate(value)
-                }}
-                clearable={false}
-                disabled={!canEdit || isPending}
-                placeholder="Data de fim"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="settings-currency">Moeda base</Label>
-              <Select
-                value={baseCurrency}
-                onValueChange={(value) => setBaseCurrency(value as Currency)}
-                disabled={!canEdit || isPending}
-              >
-                <SelectTrigger id="settings-currency" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((currency) => (
-                    <SelectItem key={currency} value={currency}>
-                      {currency}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
-          {canEdit ? (
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Button type="submit" disabled={isPending}>
-                {isPending ? "Salvando..." : "Salvar alterações"}
-                {isPending ? <Spinner data-icon="inline-end" /> : null}
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                disabled={isDeleting}
-                onClick={handleDelete}
-              >
-                {isDeleting ? null : <Trash2 data-icon="inline-start" />}
-                {isDeleting ? "Excluindo..." : "Excluir viagem"}
-                {isDeleting ? <Spinner data-icon="inline-end" /> : null}
-              </Button>
-            </div>
-          ) : null}
-        </form>
-      </CardContent>
-    </Card>
+            {canEdit ? (
+              <div className="flex flex-wrap gap-2 pt-2">
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "Salvando..." : "Salvar alterações"}
+                  {isPending ? <Spinner data-icon="inline-end" /> : null}
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  disabled={isDeleting}
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  <Trash2 data-icon="inline-start" />
+                  Excluir viagem
+                </Button>
+              </div>
+            ) : null}
+          </form>
+        </CardContent>
+      </Card>
+
+      <ConfirmDeleteDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Excluir esta viagem?"
+        description="Esta ação não pode ser desfeita."
+        isPending={isDeleting}
+        confirmLabel="Excluir viagem"
+        onConfirm={handleDelete}
+      />
+    </>
   )
 }
