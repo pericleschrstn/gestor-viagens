@@ -1,26 +1,16 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
-import {
-  ArrowDownUp,
-  Calendar as CalendarIcon,
-  ListFilter,
-  Search,
-  User,
-} from "lucide-react"
-import type { DateRange } from "react-day-picker"
+import { ArrowDownUp, ListFilter, Search, User } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
 import {
   Command,
   CommandGroup,
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
+import { DatePicker } from "@/components/ui/date-picker"
 import { FacetedFilter } from "@/components/ui/faceted-filter"
 import { Input } from "@/components/ui/input"
 import {
@@ -28,7 +18,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
 import type {
   ExpenseCategory,
   ExpenseSortOrder,
@@ -36,7 +25,6 @@ import type {
 import { useExpensesApp } from "@/features/expenses/ui/expenses-provider"
 import { ALL_CATEGORIES } from "@/lib/categories"
 import { categoryLabel } from "@/lib/format"
-import { cn } from "@/lib/utils"
 
 const SORT_OPTIONS: { value: ExpenseSortOrder; label: string }[] = [
   { value: "newest", label: "Mais recentes" },
@@ -45,26 +33,12 @@ const SORT_OPTIONS: { value: ExpenseSortOrder; label: string }[] = [
   { value: "amount_asc", label: "Menor valor" },
 ]
 
-function toIsoDate(date: Date) {
-  return format(date, "yyyy-MM-dd")
-}
-
-function formatRangeLabel(range: DateRange | undefined) {
-  if (!range?.from) return "Período"
-  const from = format(range.from, "dd MMM", { locale: ptBR })
-  if (!range.to) return from
-  const to = format(range.to, "dd MMM", { locale: ptBR })
-  return `${from} – ${to}`
-}
-
 export function ExpensesFilters() {
   const {
     state: { filters, members },
-    actions: { updateFilter },
+    actions: { updateFilter, setFilters },
   } = useExpensesApp()
 
-  const [range, setRange] = useState<DateRange | undefined>()
-  const [periodOpen, setPeriodOpen] = useState(false)
   const [sortOpen, setSortOpen] = useState(false)
 
   const categoryOptions = useMemo(
@@ -73,7 +47,7 @@ export function ExpensesFilters() {
         value: category,
         label: categoryLabel(category),
       })),
-    []
+    [],
   )
 
   const memberOptions = useMemo(
@@ -82,27 +56,18 @@ export function ExpensesFilters() {
         value: member.id,
         label: member.name,
       })),
-    [members]
+    [members],
   )
 
   const activeSort =
     SORT_OPTIONS.find(
-      (option) => option.value === (filters.sort ?? "newest")
+      (option) => option.value === (filters.sort ?? "newest"),
     ) ?? SORT_OPTIONS[0]!
 
-  function handleRangeSelect(next: DateRange | undefined) {
-    setRange(next)
-    updateFilter("startDate", next?.from ? toIsoDate(next.from) : undefined)
-    updateFilter("endDate", next?.to ? toIsoDate(next.to) : undefined)
-  }
-
-  function clearRange() {
-    setRange(undefined)
-    updateFilter("startDate", undefined)
-    updateFilter("endDate", undefined)
-  }
-
-  const hasPeriod = Boolean(range?.from)
+  const periodValue =
+    filters.startDate || filters.endDate
+      ? { from: filters.startDate, to: filters.endDate }
+      : undefined
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -127,7 +92,7 @@ export function ExpensesFilters() {
           onChange={(categories) =>
             updateFilter(
               "categories",
-              categories.length ? (categories as ExpenseCategory[]) : undefined
+              categories.length ? (categories as ExpenseCategory[]) : undefined,
             )
           }
         />
@@ -142,53 +107,20 @@ export function ExpensesFilters() {
           }
         />
 
-        <Popover open={periodOpen} onOpenChange={setPeriodOpen}>
-          <PopoverTrigger
-            render={
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn("h-8 border-dashed", hasPeriod && "border-solid")}
-              />
-            }
-          >
-            <CalendarIcon data-icon="inline-start" />
-            Período
-            {hasPeriod ? (
-              <>
-                <Separator
-                  orientation="vertical"
-                  className="mx-0.5 hidden h-4 sm:block"
-                />
-                <Badge
-                  variant="secondary"
-                  className="rounded-sm px-1 font-normal"
-                >
-                  {formatRangeLabel(range)}
-                </Badge>
-              </>
-            ) : null}
-          </PopoverTrigger>
-          <PopoverContent align="start" className="w-auto p-0">
-            <Calendar
-              mode="range"
-              selected={range}
-              onSelect={handleRangeSelect}
-              numberOfMonths={1}
-              autoFocus
-            />
-            <div className="flex justify-end border-t p-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearRange}
-                disabled={!range?.from}
-              >
-                Limpar
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        <DatePicker
+          mode="range"
+          appearance="filter"
+          placeholder="Período"
+          value={periodValue}
+          onChange={(next) => {
+            setFilters({
+              ...filters,
+              startDate: next?.from,
+              endDate: next?.to,
+              page: 1,
+            })
+          }}
+        />
       </div>
 
       <div className="flex shrink-0 items-center gap-2">

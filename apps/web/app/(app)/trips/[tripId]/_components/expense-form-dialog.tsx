@@ -5,6 +5,7 @@ import { toast } from "sonner"
 import { Upload } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { DatePicker } from "@/components/ui/date-picker"
 import {
   Dialog,
   DialogContent,
@@ -25,15 +26,12 @@ import {
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { ALL_CATEGORIES, CATEGORY_CONFIG } from "@/lib/categories"
+import { todayIsoDate } from "@/lib/date"
 import { categoryLabel } from "@/lib/format"
 import { createExpenseAction } from "@/features/expenses/actions/expense.actions"
 import type { Currency, ExpenseCategory } from "@/features/expenses/domain/schemas"
 
 import { useTripApp } from "./trip-app"
-
-function todayIsoDate() {
-  return new Date().toISOString().slice(0, 10)
-}
 
 function buildEqualSplits(amount: string, memberIds: string[]) {
   if (memberIds.length === 0) return []
@@ -187,12 +185,15 @@ export function ExpenseFormDialog() {
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="date">Data</Label>
-            <Input
+            <DatePicker
               id="date"
-              type="date"
-              required
+              mode="single"
               value={date}
-              onChange={(event) => setDate(event.target.value)}
+              onChange={(value) => {
+                if (value) setDate(value)
+              }}
+              clearable={false}
+              placeholder="Selecionar data"
             />
           </div>
 

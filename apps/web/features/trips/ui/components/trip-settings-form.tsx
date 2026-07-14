@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { DatePicker } from "@/components/ui/date-picker"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -160,24 +161,30 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="settings-start">Início</Label>
-              <Input
+              <DatePicker
                 id="settings-start"
-                type="date"
+                mode="single"
                 value={startDate}
-                onChange={(event) => setStartDate(event.target.value)}
+                onChange={(value) => {
+                  if (value) setStartDate(value)
+                }}
+                clearable={false}
                 disabled={!canEdit || isPending}
-                required
+                placeholder="Data de início"
               />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="settings-end">Fim</Label>
-              <Input
+              <DatePicker
                 id="settings-end"
-                type="date"
+                mode="single"
                 value={endDate}
-                onChange={(event) => setEndDate(event.target.value)}
+                onChange={(value) => {
+                  if (value) setEndDate(value)
+                }}
+                clearable={false}
                 disabled={!canEdit || isPending}
-                required
+                placeholder="Data de fim"
               />
             </div>
             <div className="flex flex-col gap-2">

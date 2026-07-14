@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { DatePicker } from "@/components/ui/date-picker"
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/select"
 import { createTripAction } from "@/features/trips/actions/trip.actions"
 import type { Currency } from "@/features/expenses/domain/models"
+import { toIsoDate } from "@/lib/date"
 import { tripViewHref } from "@/lib/trip-routes"
 
 const CURRENCIES: Currency[] = ["BRL", "ARS"]
@@ -39,8 +41,8 @@ function defaultDates() {
   const end = new Date()
   end.setDate(end.getDate() + 7)
   return {
-    startDate: start.toISOString().slice(0, 10),
-    endDate: end.toISOString().slice(0, 10),
+    startDate: toIsoDate(start),
+    endDate: toIsoDate(end),
   }
 }
 
@@ -161,22 +163,28 @@ export function CreateTripDialog({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="trip-start">Início</Label>
-              <Input
+              <DatePicker
                 id="trip-start"
-                type="date"
+                mode="single"
                 value={startDate}
-                onChange={(event) => setStartDate(event.target.value)}
-                required
+                onChange={(value) => {
+                  if (value) setStartDate(value)
+                }}
+                clearable={false}
+                placeholder="Data de início"
               />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="trip-end">Fim</Label>
-              <Input
+              <DatePicker
                 id="trip-end"
-                type="date"
+                mode="single"
                 value={endDate}
-                onChange={(event) => setEndDate(event.target.value)}
-                required
+                onChange={(value) => {
+                  if (value) setEndDate(value)
+                }}
+                clearable={false}
+                placeholder="Data de fim"
               />
             </div>
           </div>
