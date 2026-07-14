@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 import {
   Card,
   CardContent,
@@ -7,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { AppPageHeader } from "@/components/app-page-header"
 import { CreateTripDialog } from "@/features/trips/ui/create-trip-dialog"
 
@@ -15,6 +18,8 @@ type HomeEmptyStateProps = {
 }
 
 export function HomeEmptyState({ userName }: HomeEmptyStateProps) {
+  const [createOpen, setCreateOpen] = useState(false)
+
   return (
     <>
       <AppPageHeader />
@@ -28,16 +33,13 @@ export function HomeEmptyState({ userName }: HomeEmptyStateProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <CreateTripDialog
-              trigger={
-                <button
-                  type="button"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-9 w-full items-center justify-center rounded-md px-4 text-sm font-medium"
-                >
-                  Nova viagem
-                </button>
-              }
-            />
+            <Button
+              className="w-full cursor-pointer"
+              onClick={() => setCreateOpen(true)}
+            >
+              Nova viagem
+            </Button>
+            <CreateTripDialog open={createOpen} onOpenChange={setCreateOpen} />
           </CardContent>
         </Card>
       </div>

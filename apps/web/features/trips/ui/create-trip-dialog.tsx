@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Plus } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -30,9 +29,8 @@ import { tripViewHref } from "@/lib/trip-routes"
 const CURRENCIES: Currency[] = ["BRL", "ARS"]
 
 type CreateTripDialogProps = {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  trigger?: React.ReactNode
+  open: boolean
+  onOpenChange: (open: boolean) => void
   onCreated?: (tripId: string) => void
 }
 
@@ -47,23 +45,23 @@ function defaultDates() {
 }
 
 export function CreateTripDialog({
-  open: controlledOpen,
+  open,
   onOpenChange,
-  trigger,
   onCreated,
 }: CreateTripDialogProps) {
   const router = useRouter()
-  const [internalOpen, setInternalOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const open = controlledOpen ?? internalOpen
-  const setOpen = onOpenChange ?? setInternalOpen
-
-  const defaults = defaultDates()
   const [name, setName] = useState("")
   const [initials, setInitials] = useState("")
-  const [startDate, setStartDate] = useState(defaults.startDate)
-  const [endDate, setEndDate] = useState(defaults.endDate)
+  const [startDate, setStartDate] = useState(() => {
+    const dates = defaultDates()
+    return dates.startDate
+  })
+  const [endDate, setEndDate] = useState(() => {
+    const dates = defaultDates()
+    return dates.endDate
+  })
   const [baseCurrency, setBaseCurrency] = useState<Currency>("BRL")
 
   function resetForm() {
@@ -93,7 +91,7 @@ export function CreateTripDialog({
       }
 
       toast.success("Viagem criada")
-      setOpen(false)
+      onOpenChange(false)
       resetForm()
       onCreated?.(result.data.id)
       router.push(tripViewHref(result.data.id, "dashboard"))
@@ -101,125 +99,108 @@ export function CreateTripDialog({
   }
 
   return (
-    <>
-      {trigger ? (
-        <span
-          className="contents"
-          onClick={() => setOpen(true)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              setOpen(true)
-            }
-          }}
-          role="presentation"
-        >
-          {trigger}
-        </span>
-      ) : (
-        <Button size="sm" variant="outline" className="gap-2" onClick={() => setOpen(true)}>
-          <Plus className="size-3.5" />
-          Nova viagem
-        </Button>
-      )}
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        onOpenChange(next)
+        if (!next) resetForm()
+      }}
+    >
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogHeader>
+          <DialogTitle>Nova viagem</DialogTitle>
+          <DialogDescription>
+            Crie uma viagem para começar a registrar gastos.
+          </DialogDescription>
+        </DialogHeader>
 
-      <Dialog
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next)
-          if (!next) resetForm()
-        }}
-      >
-        <DialogContent className="sm:max-w-[480px]">
-          <DialogHeader>
-            <DialogTitle>Nova viagem</DialogTitle>
-            <DialogDescription>
-              Crie uma viagem para começar a registrar gastos.
-            </DialogDescription>
-          </DialogHeader>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="trip-name">Nome</Label>
+            <Input
+              id="trip-name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Itália em família"
+              required
+            />
+          </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="trip-name">Nome</Label>
+              <Label htmlFor="trip-initials">Iniciais</Label>
               <Input
-                id="trip-name"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="Itália em família"
+                id="trip-initials"
+                maxLength={4}
+                value={initials}
+                onChange={(event) => setInitials(event.target.value)}
+                placeholder="IT"
                 required
               />
             </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="trip-initials">Iniciais</Label>
-                <Input
-                  id="trip-initials"
-                  maxLength={4}
-                  value={initials}
-                  onChange={(event) => setInitials(event.target.value)}
-                  placeholder="IT"
-                  required
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="trip-currency">Moeda</Label>
-                <Select
-                  value={baseCurrency}
-                  onValueChange={(value) => setBaseCurrency(value as Currency)}
-                >
-                  <SelectTrigger id="trip-currency">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CURRENCIES.map((currency) => (
-                      <SelectItem key={currency} value={currency}>
-                        {currency}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="trip-start">Início</Label>
-                <Input
-                  id="trip-start"
-                  type="date"
-                  value={startDate}
-                  onChange={(event) => setStartDate(event.target.value)}
-                  required
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="trip-end">Fim</Label>
-                <Input
-                  id="trip-end"
-                  type="date"
-                  value={endDate}
-                  onChange={(event) => setEndDate(event.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isPending}
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="trip-currency">Moeda</Label>
+              <Select
+                value={baseCurrency}
+                onValueChange={(value) => setBaseCurrency(value as Currency)}
               >
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? "Criando..." : "Criar viagem"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </>
+                <SelectTrigger id="trip-currency">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((currency) => (
+                    <SelectItem key={currency} value={currency}>
+                      {currency}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="trip-start">Início</Label>
+              <Input
+                id="trip-start"
+                type="date"
+                value={startDate}
+                onChange={(event) => setStartDate(event.target.value)}
+                required
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="trip-end">Fim</Label>
+              <Input
+                id="trip-end"
+                type="date"
+                value={endDate}
+                onChange={(event) => setEndDate(event.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() => onOpenChange(false)}
+              disabled={isPending}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              className="cursor-pointer"
+              disabled={isPending}
+            >
+              {isPending ? "Criando..." : "Criar viagem"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

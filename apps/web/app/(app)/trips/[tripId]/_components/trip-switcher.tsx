@@ -37,50 +37,57 @@ export function TripSwitcher({ trip, trips }: TripSwitcherProps) {
   return (
     <>
       <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <SidebarMenuButton
-                size="lg"
-                tooltip={trip.name}
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              />
-            }
-          >
-            <div className="bg-primary text-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold">
-              {trip.initials}
-            </div>
-            <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-              <span className="truncate font-semibold">{trip.name}</span>
-              <span className="text-muted-foreground truncate text-xs">
-                {tripStatusLabel(trip.status)} ·{" "}
-                {formatTripDates(trip.startDate, trip.endDate)}
-              </span>
-            </div>
-            <ChevronDown className="text-muted-foreground ml-auto group-data-[collapsible=icon]:hidden" />
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent className="w-[236px]" align="start">
-            {trips.map((item) => (
-              <TripSwitcherMenuItem key={item.id} item={item} currentId={trip.id} />
-            ))}
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem
-              className="gap-2"
-              onSelect={() => setCreateOpen(true)}
+        <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <SidebarMenuButton
+                  size="lg"
+                  tooltip={trip.name}
+                  className="cursor-pointer data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                />
+              }
             >
-              <Plus />
-              Nova viagem
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+              <div className="bg-primary text-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold">
+                {trip.initials}
+              </div>
+              <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                <span className="truncate font-semibold">{trip.name}</span>
+                <span className="text-muted-foreground truncate text-xs">
+                  {tripStatusLabel(trip.status)} ·{" "}
+                  {formatTripDates(trip.startDate, trip.endDate)}
+                </span>
+              </div>
+              <ChevronDown className="text-muted-foreground ml-auto group-data-[collapsible=icon]:hidden" />
+            </DropdownMenuTrigger>
 
-    <CreateTripDialog open={createOpen} onOpenChange={setCreateOpen} />
+            <DropdownMenuContent className="w-[236px]" align="start">
+              {trips.map((item) => (
+                <TripSwitcherMenuItem
+                  key={item.id}
+                  item={item}
+                  currentId={trip.id}
+                />
+              ))}
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                className="cursor-pointer gap-2"
+                onClick={() => {
+                  // Defer so the menu can close before the dialog opens (Base UI focus).
+                  requestAnimationFrame(() => setCreateOpen(true))
+                }}
+              >
+                <Plus />
+                Nova viagem
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
+
+      <CreateTripDialog open={createOpen} onOpenChange={setCreateOpen} />
     </>
   )
 }
@@ -96,10 +103,11 @@ function TripSwitcherMenuItem({
 
   return (
     <DropdownMenuItem
+      className="cursor-pointer"
       render={
         <Link
           href={tripHref(item.id, pathname)}
-          className="flex items-center gap-2.5"
+          className="flex cursor-pointer items-center gap-2.5"
         />
       }
     >
