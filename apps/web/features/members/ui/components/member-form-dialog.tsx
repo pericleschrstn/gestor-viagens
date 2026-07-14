@@ -30,10 +30,13 @@ type MemberFormDialogProps = {
   member: Member | null
 }
 
-const ROLE_OPTIONS: { value: TripRole; label: string }[] = [
+const ROLE_ITEMS = [
+  { value: "OWNER", label: "Dono" },
   { value: "EDITOR", label: "Editor" },
   { value: "VIEWER", label: "Visualizador" },
-]
+] as const satisfies readonly { value: TripRole; label: string }[]
+
+const ROLE_OPTIONS = ROLE_ITEMS.filter((option) => option.value !== "OWNER")
 
 export function MemberFormDialog({
   open,
@@ -124,6 +127,7 @@ export function MemberFormDialog({
           <div className="flex flex-col gap-2">
             <Label htmlFor="member-role">Papel</Label>
             <Select
+              items={[...ROLE_ITEMS]}
               value={role}
               onValueChange={(value) => setRole(value as TripRole)}
             >

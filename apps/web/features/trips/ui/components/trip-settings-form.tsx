@@ -143,6 +143,7 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
             <div className="flex flex-col gap-2">
               <Label htmlFor="settings-status">Status</Label>
               <Select
+                items={STATUS_OPTIONS}
                 value={status}
                 onValueChange={(value) => setStatus(value as TripStatus)}
                 disabled={!canEdit || isPending}
