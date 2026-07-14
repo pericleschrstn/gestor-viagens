@@ -6,6 +6,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -51,25 +52,25 @@ export function MembersList() {
   return (
     <>
       <Card>
-        <CardHeader className="flex-row items-start justify-between space-y-0">
-          <div>
-            <CardTitle className="text-sm font-medium">Integrantes</CardTitle>
-            <CardDescription>
-              Pessoas que participam desta viagem
-            </CardDescription>
-          </div>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">Integrantes</CardTitle>
+          <CardDescription>
+            Pessoas que participam desta viagem
+          </CardDescription>
           {capabilities.canManageMembers ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setEditingMember(null)
-                setFormOpen(true)
-              }}
-            >
-              <Plus className="size-3.5" />
-              Adicionar
-            </Button>
+            <CardAction>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setEditingMember(null)
+                  setFormOpen(true)
+                }}
+              >
+                <Plus className="size-3.5" />
+                Adicionar
+              </Button>
+            </CardAction>
           ) : null}
         </CardHeader>
         <CardContent className="pt-1">

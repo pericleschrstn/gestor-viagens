@@ -116,19 +116,18 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="flex max-w-lg flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="settings-name">Nome</Label>
-            <Input
-              id="settings-name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              disabled={!canEdit || isPending}
-              required
-            />
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="settings-name">Nome</Label>
+              <Input
+                id="settings-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                disabled={!canEdit || isPending}
+                required
+              />
+            </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="settings-initials">Iniciais</Label>
               <Input
@@ -147,7 +146,7 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
                 onValueChange={(value) => setStatus(value as TripStatus)}
                 disabled={!canEdit || isPending}
               >
-                <SelectTrigger id="settings-status">
+                <SelectTrigger id="settings-status" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -159,9 +158,6 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="settings-start">Início</Label>
               <Input
@@ -184,26 +180,25 @@ export function TripSettingsForm({ trip, capabilities }: TripSettingsFormProps) 
                 required
               />
             </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="settings-currency">Moeda base</Label>
-            <Select
-              value={baseCurrency}
-              onValueChange={(value) => setBaseCurrency(value as Currency)}
-              disabled={!canEdit || isPending}
-            >
-              <SelectTrigger id="settings-currency">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CURRENCIES.map((currency) => (
-                  <SelectItem key={currency} value={currency}>
-                    {currency}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="settings-currency">Moeda base</Label>
+              <Select
+                value={baseCurrency}
+                onValueChange={(value) => setBaseCurrency(value as Currency)}
+                disabled={!canEdit || isPending}
+              >
+                <SelectTrigger id="settings-currency" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((currency) => (
+                    <SelectItem key={currency} value={currency}>
+                      {currency}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {canEdit ? (
